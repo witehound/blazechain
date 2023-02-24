@@ -7,6 +7,15 @@ import (
 
 type Hash [32]uint8
 
+func (h *Hash) FindCachedHash() bool {
+	for i := 0; i < 32; i++ {
+		if h[i] != 0 {
+			return false
+		}
+	}
+	return true
+}
+
 func HashFromByte(b []byte) Hash {
 	if len(b) != 32 {
 		msg := fmt.Sprintf("length should be 32 bubt got %d", len(b))
