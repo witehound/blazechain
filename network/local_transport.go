@@ -12,7 +12,7 @@ type LocalTransport struct {
 	consumeChan chan RPC
 }
 
-func NewLocalTransport(addr NetAdd) Transport {
+func NewLocalTransport(addr NetAdd) *LocalTransport {
 	return &LocalTransport{
 		addr:        addr,
 		consumeChan: make(chan RPC, 1024),
@@ -24,11 +24,11 @@ func (t *LocalTransport) Consume() <-chan RPC {
 	return t.consumeChan
 }
 
-func (t *LocalTransport) Connet(tr Transport) error {
+func (t *LocalTransport) Connet(tr *LocalTransport) error {
 	t.lock.Lock()
 	defer t.lock.Unlock()
 
-	t.peers[tr.Addr()] = tr.(*LocalTransport)
+	t.peers[tr.Addr()] = tr
 
 	return nil
 }
