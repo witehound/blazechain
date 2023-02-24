@@ -10,7 +10,7 @@ import (
 type Header struct {
 	Version   uint32
 	Prevlock  types.Hash
-	TimeStamp uint64
+	TimeStamp int64
 	Height    uint32
 	Nonce     uint64
 }
