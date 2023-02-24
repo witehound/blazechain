@@ -1,7 +1,15 @@
 package main
 
-import "fmt"
+import (
+	"github.com/witehound/blazechain/network"
+)
 
 func main() {
-	fmt.Println("hello world")
+	trLocal := network.NewLocalTransport("lpone")
+
+	opts := network.ServerOpts{
+		Transports: []network.Transport{trLocal},
+	}
+
+	s := network.NewServer(opts)
 }
