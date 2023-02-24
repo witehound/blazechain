@@ -4,6 +4,9 @@ build:
 run: build
 	./bin/blazechain
 
+stop:
+	
+
 test:
 	go test -v ./...
 
