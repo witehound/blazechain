@@ -1,0 +1,9 @@
+build: 
+	go build -o ./bin/blazechain
+
+run: build
+	./bin/blazechain
+
+test:
+	go test -v ./...
+
