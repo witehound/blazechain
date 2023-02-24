@@ -28,7 +28,6 @@ func (b *Block) Hash() types.Hash {
 	b.Header.DecodeBinary(buf)
 	if b.hash.FindCachedHash() {
 		b.hash = types.Hash(sha256.Sum256(buf.Bytes()))
-
 	}
 
 	return b.hash
