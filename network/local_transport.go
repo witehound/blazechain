@@ -24,7 +24,7 @@ func (t *LocalTransport) Consume() <-chan RPC {
 	return t.consumeChan
 }
 
-func (t *LocalTransport) Connet(tr LocalTransport) error {
+func (t *LocalTransport) Connet(tr *LocalTransport) error {
 	t.lock.Lock()
 	defer t.lock.Unlock()
 
