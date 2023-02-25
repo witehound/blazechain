@@ -1,5 +1,7 @@
 package core
 
+import "fmt"
+
 type Validator interface {
 	ValidateBlock(*Block) error
 }
@@ -15,5 +17,9 @@ func NewBlockValidator(bc *BlockChain) *BlockValidator {
 }
 
 func (bv *BlockValidator) ValidateBlock(b *Block) error {
+
+	if bv.bc.Height() != b.Header.Height-1 {
+		return fmt.Errorf("invalid block height")
+	}
 	return nil
 }
