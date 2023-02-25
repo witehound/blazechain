@@ -11,11 +11,11 @@ import (
 
 func TestHeader_decode_encode(t *testing.T) {
 	h := &Header{
-		Version:   1,
-		Prevlock:  types.RandomHash(),
-		TimeStamp: time.Now().UnixNano(),
-		Height:    10,
-		Nonce:     985677,
+		Version:      1,
+		PrevlockHash: types.RandomHash(),
+		TimeStamp:    time.Now().UnixNano(),
+		Height:       10,
+		Nonce:        985677,
 	}
 
 	buf := &bytes.Buffer{}
@@ -29,11 +29,11 @@ func TestHeader_decode_encode(t *testing.T) {
 
 func TestBlock_decode_encode(t *testing.T) {
 	h := Header{
-		Version:   1,
-		Prevlock:  types.RandomHash(),
-		TimeStamp: time.Now().UnixNano(),
-		Height:    10,
-		Nonce:     985677,
+		Version:      1,
+		PrevlockHash: types.RandomHash(),
+		TimeStamp:    time.Now().UnixNano(),
+		Height:       10,
+		Nonce:        985677,
 	}
 
 	b := &Block{
@@ -52,11 +52,11 @@ func TestBlock_decode_encode(t *testing.T) {
 
 func TestBlock_hash(t *testing.T) {
 	h := Header{
-		Version:   1,
-		Prevlock:  types.RandomHash(),
-		TimeStamp: time.Now().UnixNano(),
-		Height:    10,
-		Nonce:     985677,
+		Version:      1,
+		PrevlockHash: types.RandomHash(),
+		TimeStamp:    time.Now().UnixNano(),
+		Height:       10,
+		Nonce:        985677,
 	}
 
 	b := &Block{

@@ -10,16 +10,16 @@ import (
 	"github.com/witehound/blazechain/types"
 )
 
+type Signature struct {
+	r, s *big.Int
+}
+
 type PrivateKey struct {
 	Key *ecdsa.PrivateKey
 }
 
 type PublicKey struct {
 	Key *ecdsa.PublicKey
-}
-
-type Signature struct {
-	r, s *big.Int
 }
 
 func GeneratePrivateKey() PrivateKey {
