@@ -11,6 +11,12 @@ type Transaction struct {
 }
 
 func (tx *Transaction) SignTx(key crypto.PrivateKey) error {
+	sig, err := key.Sign(tx.Data)
+	if err != nil {
+		return err
+	}
+	tx.PublicKey = key.GetPublicKey()
+	tx.Signature = sig
 
 	return nil
 }
