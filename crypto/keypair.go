@@ -27,3 +27,9 @@ func GeneratePrivateKey() PrivateKey {
 		Key: key,
 	}
 }
+
+func (k PrivateKey) GeneratePublicKey() PublicKey {
+	return PublicKey{
+		Key: &k.Key.PublicKey,
+	}
+}
