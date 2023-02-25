@@ -53,3 +53,19 @@ func TestValidator(t *testing.T) {
 	assert.NotNil(t, bc.AddBlock(bc.RandomBlockWithSig(14)))
 
 }
+
+func TestBlockHeeder(t *testing.T) {
+	bc := StartNewBlockChainWithGenesis(t)
+
+	var ct uint32 = 0
+
+	for i := 0; i < 1; i++ {
+		ct++
+		tb := bc.RandomBlockWithSig(uint32(i + 1))
+		bc.AddBlock(tb)
+		h, err := bc.BlockHeader(tb.Header.Height)
+		assert.Nil(t, err)
+		assert.Equal(t, &tb.Header, h)
+
+	}
+}

@@ -1,5 +1,7 @@
 package core
 
+import "fmt"
+
 type BlockChain struct {
 	Headers   []*Header
 	Store     Storage
@@ -46,4 +48,11 @@ func (bc *BlockChain) AddBlockWithoutValidator(b *Block) error {
 	bc.Headers = append(bc.Headers, &b.Header)
 	return bc.Store.Put(b)
 
+}
+
+func (bc *BlockChain) BlockHeader(h uint32) (*Header, error) {
+	if !bc.HasBlock(h) {
+		return nil, fmt.Errorf("invalid block height : %d", h)
+	}
+	return bc.Headers[h], nil
 }
