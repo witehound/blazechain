@@ -18,6 +18,9 @@ func TestGenarate_privateKey(t *testing.T) {
 
 	assert.Nil(t, err)
 
+	tr := sig.Verify(pubKey, msg)
+
+	assert.True(t, tr)
+
 	fmt.Println(address)
-	fmt.Println(sig)
 }

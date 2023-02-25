@@ -19,7 +19,7 @@ type PublicKey struct {
 }
 
 type Signature struct {
-	s, r *big.Int
+	r, s *big.Int
 }
 
 func GeneratePrivateKey() PrivateKey {
@@ -46,7 +46,7 @@ func (k PrivateKey) Sign(data []byte) (*Signature, error) {
 	}
 
 	return &Signature{
-		r, s,
+		r: r, s: s,
 	}, nil
 }
 
