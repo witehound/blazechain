@@ -1,10 +1,11 @@
 package core
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/witehound/blazechain/crypto"
 	"github.com/witehound/blazechain/types"
 )
 
@@ -23,7 +24,12 @@ func RandomBlock(height uint32) *Block {
 	return NewBlock(Header(*h), []Transaction{txs})
 }
 
-func TestBlock_Hash(t *testing.T) {
+func TestBlock_Signing(t *testing.T) {
+	privkey := crypto.GeneratePrivateKey()
 	b := RandomBlock(0)
-	fmt.Println(b.Hash(BlockHasher{}))
+
+	assert.Nil(t, b.Sign(privkey))
+
+	assert.NotNil(t, b.Signature)
+
 }

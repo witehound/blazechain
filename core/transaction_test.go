@@ -32,4 +32,10 @@ func TestVerifyTx(t *testing.T) {
 
 	assert.Nil(t, tx.VerifyTx())
 
+	privkeyTwo := crypto.GeneratePrivateKey()
+
+	tx.PublicKey = privkeyTwo.GetPublicKey()
+
+	assert.NotNil(t, tx.VerifyTx())
+
 }
