@@ -21,5 +21,10 @@ func (bv *BlockValidator) ValidateBlock(b *Block) error {
 	if bv.bc.Height() != b.Header.Height-1 {
 		return fmt.Errorf("invalid block height")
 	}
+
+	if err := b.Verify(); err != nil {
+		return err
+	}
+
 	return nil
 }

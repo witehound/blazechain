@@ -24,6 +24,14 @@ func RandomBlock(height uint32) *Block {
 	return NewBlock(Header(*h), []Transaction{txs})
 }
 
+func (bc *BlockChain) RandomBlockWithSig(height uint32) *Block {
+	b := RandomBlock(height)
+	privkey := crypto.GeneratePrivateKey()
+	b.Sign(privkey)
+
+	return b
+}
+
 func TestBlock_Signing(t *testing.T) {
 	privkey := crypto.GeneratePrivateKey()
 	b := RandomBlock(0)

@@ -30,7 +30,7 @@ func TestAddBlock(t *testing.T) {
 
 	for i := 0; i < 1000; i++ {
 		ct++
-		bc.AddBlock(RandomBlock(uint32(i + 1)))
+		bc.AddBlock(bc.RandomBlockWithSig(uint32(i + 1)))
 	}
 
 	assert.Equal(t, bc.Height(), ct)
@@ -44,12 +44,12 @@ func TestValidator(t *testing.T) {
 
 	for i := 0; i < 10; i++ {
 		ct++
-		bc.AddBlock(RandomBlock(uint32(i + 1)))
+		bc.AddBlock(bc.RandomBlockWithSig(uint32(i + 1)))
 	}
 
-	assert.Nil(t, bc.AddBlock(RandomBlock(ct+1)))
+	assert.Nil(t, bc.AddBlock(bc.RandomBlockWithSig(ct+1)))
 
-	assert.NotNil(t, bc.AddBlock(RandomBlock(3)))
-	assert.NotNil(t, bc.AddBlock(RandomBlock(14)))
+	assert.NotNil(t, bc.AddBlock(bc.RandomBlockWithSig(3)))
+	assert.NotNil(t, bc.AddBlock(bc.RandomBlockWithSig(14)))
 
 }
