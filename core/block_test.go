@@ -49,3 +49,22 @@ func TestBlock_decode_encode(t *testing.T) {
 
 	assert.Equal(t, b, bDecode)
 }
+
+func TestBlock_hash(t *testing.T) {
+	h := Header{
+		Version:   1,
+		Prevlock:  types.RandomHash(),
+		TimeStamp: time.Now().UnixNano(),
+		Height:    10,
+		Nonce:     985677,
+	}
+
+	b := &Block{
+		Header:       h,
+		Transactions: []Transaction{},
+	}
+
+	hash := b.Hash()
+
+	assert.False(t, hash.FindCachedHash())
+}
