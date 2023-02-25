@@ -5,6 +5,7 @@ import (
 	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/sha256"
+	"math/big"
 
 	"github.com/witehound/blazechain/types"
 )
@@ -18,6 +19,7 @@ type PublicKey struct {
 }
 
 type Signature struct {
+	s, r *big.Int
 }
 
 func GeneratePrivateKey() PrivateKey {
@@ -31,10 +33,21 @@ func GeneratePrivateKey() PrivateKey {
 	}
 }
 
-func (k PrivateKey) GeneratePublicKey() PublicKey {
+func (k PrivateKey) GetPublicKey() PublicKey {
 	return PublicKey{
 		Key: &k.Key.PublicKey,
 	}
+}
+
+func (k PrivateKey) Sign(data []byte) (*Signature, error) {
+	r, s, err := ecdsa.Sign(rand.Reader, k.Key, data)
+	if err != nil {
+		panic(err)
+	}
+
+	return &Signature{
+		r, s,
+	}, nil
 }
 
 func (k PublicKey) ToSlice() []byte {
@@ -43,5 +56,9 @@ func (k PublicKey) ToSlice() []byte {
 
 func (k PublicKey) Address() types.Address {
 	h := sha256.Sum256(k.ToSlice())
-	return types.NewAddressFromByte(h[len(h)-20:])
+	return types.AddressFromByte(h[len(h)-20:])
+}
+
+func (s Signature) Verify(pub PublicKey, data []byte) bool {
+	return ecdsa.Verify(pub.Key, data, s.r, s.s)
 }
