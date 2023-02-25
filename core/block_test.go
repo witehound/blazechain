@@ -1,70 +1,29 @@
 package core
 
 import (
-	"bytes"
+	"fmt"
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/witehound/blazechain/types"
 )
 
-func TestHeader_decode_encode(t *testing.T) {
+func RandomBlock(height uint32) *Block {
 	h := &Header{
 		Version:      1,
 		PrevlockHash: types.RandomHash(),
+		Height:       height,
 		TimeStamp:    time.Now().UnixNano(),
-		Height:       10,
-		Nonce:        985677,
 	}
 
-	buf := &bytes.Buffer{}
-	assert.Nil(t, h.EncodeBinary(buf))
+	txs := Transaction{
+		Data: []byte("foo"),
+	}
 
-	hDecode := &Header{}
-	assert.Nil(t, hDecode.DecodeBinary(buf))
-
-	assert.Equal(t, h, hDecode)
+	return NewBlock(Header(*h), []Transaction{txs})
 }
 
-func TestBlock_decode_encode(t *testing.T) {
-	h := Header{
-		Version:      1,
-		PrevlockHash: types.RandomHash(),
-		TimeStamp:    time.Now().UnixNano(),
-		Height:       10,
-		Nonce:        985677,
-	}
-
-	b := &Block{
-		Header:       h,
-		Transactions: nil,
-	}
-
-	buf := &bytes.Buffer{}
-	assert.Nil(t, b.EncodeBinary(buf))
-
-	bDecode := &Block{}
-	assert.Nil(t, bDecode.DecodeBinary(buf))
-
-	assert.Equal(t, b, bDecode)
-}
-
-func TestBlock_hash(t *testing.T) {
-	h := Header{
-		Version:      1,
-		PrevlockHash: types.RandomHash(),
-		TimeStamp:    time.Now().UnixNano(),
-		Height:       10,
-		Nonce:        985677,
-	}
-
-	b := &Block{
-		Header:       h,
-		Transactions: []Transaction{},
-	}
-
-	hash := b.Hash()
-
-	assert.False(t, hash.FindCachedHash())
+func TestBlock_Hash(t *testing.T) {
+	b := RandomBlock(0)
+	fmt.Println(b.Hash(BlockHasher{}))
 }

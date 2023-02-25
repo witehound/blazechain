@@ -1,8 +1,9 @@
 package core
 
 import (
-	"crypto"
+	"io"
 
+	"github.com/witehound/blazechain/crypto"
 	"github.com/witehound/blazechain/types"
 )
 
@@ -19,7 +20,7 @@ type Block struct {
 	Transactions []Transaction
 	hash         types.Hash
 	Validator    crypto.PublicKey
-	Signature    *types.Signature
+	Signature    crypto.Signature
 }
 
 func (b *Block) Hash(hasher Hasher[*Block]) types.Hash {
@@ -30,63 +31,21 @@ func (b *Block) Hash(hasher Hasher[*Block]) types.Hash {
 	return b.hash
 }
 
-// func (h *Header) EncodeBinary(w io.Writer) error {
-// 	if err := binary.Write(w, binary.LittleEndian, &h.Version); err != nil {
-// 		return err
-// 	}
-// 	if err := binary.Write(w, binary.LittleEndian, &h.PrevlockHash); err != nil {
-// 		return err
-// 	}
-// 	if err := binary.Write(w, binary.LittleEndian, &h.TimeStamp); err != nil {
-// 		return err
-// 	}
-// 	if err := binary.Write(w, binary.LittleEndian, &h.Height); err != nil {
-// 		return err
-// 	}
+func (b *Block) Decode(r io.Reader, dec Decoder[*Block]) error {
+	return dec.Decode(r, b)
+}
 
-// 	return binary.Write(w, binary.LittleEndian, &h.Nonce)
-// }
+func (b *Block) Encode(w io.Writer, enc Encoder[*Block]) error {
+	return enc.Encode(w, b)
+}
 
-// func (h *Header) DecodeBinary(r io.Reader) error {
-// 	if err := binary.Read(r, binary.LittleEndian, &h.Version); err != nil {
-// 		return err
-// 	}
-// 	if err := binary.Read(r, binary.LittleEndian, &h.PrevlockHash); err != nil {
-// 		return err
-// 	}
-// 	if err := binary.Read(r, binary.LittleEndian, &h.TimeStamp); err != nil {
-// 		return err
-// 	}
-// 	if err := binary.Read(r, binary.LittleEndian, &h.Height); err != nil {
-// 		return err
-// 	}
+func NewBlock(h Header, txs []Transaction) *Block {
+	return &Block{
+		Header:       h,
+		Transactions: txs,
+	}
+}
 
-// 	return binary.Read(r, binary.LittleEndian, &h.Nonce)
+func (b *Block) Sign() {
 
-// }
-
-// func (b *Block) EncodeBinary(w io.Writer) error {
-// 	if err := b.Header.EncodeBinary(w); err != nil {
-// 		return err
-// 	}
-// 	for _, tx := range b.Transactions {
-// 		if err := tx.EncodeBinary(w); err != nil {
-// 			return err
-// 		}
-// 	}
-
-// 	return nil
-// }
-
-// func (b *Block) DecodeBinary(r io.Reader) error {
-// 	if err := b.Header.DecodeBinary(r); err != nil {
-// 		return err
-// 	}
-// 	for _, tx := range b.Transactions {
-// 		if err := tx.DecodeBinary(r); err != nil {
-// 			return err
-// 		}
-// 	}
-
-// 	return nil
-// }
+}

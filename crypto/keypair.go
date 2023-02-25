@@ -39,7 +39,7 @@ func (k PrivateKey) GetPublicKey() PublicKey {
 	}
 }
 
-func (k PrivateKey) Sign(data []byte) (*Signature, error) {
+func (k *PrivateKey) Sign(data []byte) (*Signature, error) {
 	r, s, err := ecdsa.Sign(rand.Reader, k.Key, data)
 	if err != nil {
 		panic(err)

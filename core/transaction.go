@@ -1,21 +1,16 @@
 package core
 
 import (
-	"crypto"
-
-	"github.com/witehound/blazechain/types"
+	"github.com/witehound/blazechain/crypto"
 )
 
 type Transaction struct {
 	Data      []byte
 	PublicKey crypto.PublicKey
-	Signature *types.Signature
+	Signature *crypto.Signature
 }
 
-// func (tx *Transaction) EncodeBinary(w io.Writer) error {
-// 	return nil
-// }
+func (tx *Transaction) SignTx(key crypto.PrivateKey) error {
 
-// func (tx *Transaction) DecodeBinary(r io.Reader) error {
-// 	return nil
-// }
+	return nil
+}
