@@ -19,7 +19,7 @@ type Header struct {
 }
 
 type Block struct {
-	Header
+	Header       Header
 	Transactions []Transaction
 	hash         types.Hash
 	Validator    crypto.PublicKey
