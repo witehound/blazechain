@@ -24,6 +24,8 @@ func NewTxMapSorter(txMap map[types.Hash]*core.Transaction) *TxMapSorter {
 
 	sort.Sort(s)
 
+	return s
+
 }
 
 func (t *TxMapSorter) Len() int {
@@ -33,8 +35,8 @@ func (t *TxMapSorter) Len() int {
 func (t *TxMapSorter) Swap(i, j int) {
 	t.transactions[i], t.transactions[j] = t.transactions[j], t.transactions[i]
 }
-func (t *TxMapSorter) Less(i, j int) {
-	t.transactions[i], t.transactions[j] = t.transactions[j], t.transactions[i]
+func (t *TxMapSorter) Less(i, j int) bool {
+	return t.transactions[i].FirstSeen() < t.transactions[j].FirstSeen()
 }
 
 type MemePool struct {

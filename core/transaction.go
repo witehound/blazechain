@@ -12,7 +12,7 @@ type Transaction struct {
 	From      crypto.PublicKey
 	Signature *crypto.Signature
 	hash      types.Hash
-	FirstSeen uint64
+	firstSeen uint64
 }
 
 func (tx *Transaction) SignTx(key crypto.PrivateKey) error {
@@ -58,9 +58,9 @@ func NewTransactionWithSig(data string) *Transaction {
 }
 
 func (tx *Transaction) SetFirstSeen(t uint64) {
-	tx.FirstSeen = t
+	tx.firstSeen = t
 }
 
-func (tx *Transaction) GetFirstSeen() uint64 {
-	return tx.FirstSeen
+func (tx *Transaction) FirstSeen() uint64 {
+	return tx.firstSeen
 }
