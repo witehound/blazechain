@@ -81,9 +81,7 @@ func (s *Server) HandleTransaction(tx *core.Transaction) error {
 func (s *Server) CreateNewBlock() error {
 	fmt.Println("creating a new block")
 
-	// mp := s.MemePool
-
-	s.MemePool.Flush()
+	// s.MemePool.Flush()
 
 	return nil
 }
