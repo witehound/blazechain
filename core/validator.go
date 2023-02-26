@@ -22,7 +22,7 @@ func (bv *BlockValidator) ValidateBlock(b *Block) error {
 		return fmt.Errorf("invalid block height")
 	}
 
-	_, err := bv.bc.BlockHeader(b.Header.Height - 1)
+	prevHeader, err := bv.bc.BlockHeader(b.Header.Height - 1)
 
 	if err != nil {
 		return fmt.Errorf("invalid block hash")

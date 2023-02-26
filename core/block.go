@@ -26,9 +26,9 @@ type Block struct {
 	Signature    *crypto.Signature
 }
 
-func (b *Block) Hash(hasher Hasher[*Block]) types.Hash {
+func (b *Block) Hash(hasher Hasher[*Header]) types.Hash {
 	if b.hash.FindCachedHash() {
-		b.hash = hasher.Hash(b)
+		b.hash = hasher.Hash(&b.Header)
 	}
 
 	return b.hash
@@ -50,7 +50,7 @@ func NewBlock(h Header, txs []Transaction) *Block {
 }
 
 func (b *Block) Sign(key crypto.PrivateKey) error {
-	sig, err := key.Sign(b.HeaderData())
+	sig, err := key.Sign(b.Header.Bytes())
 
 	if err != nil {
 		return err
@@ -67,17 +67,17 @@ func (b *Block) Verify() error {
 		return fmt.Errorf("block has no signature")
 	}
 
-	if !b.Signature.Verify(b.Validator, b.HeaderData()) {
+	if !b.Signature.Verify(b.Validator, b.Header.Bytes()) {
 		return fmt.Errorf("block has invalid signature")
 	}
 
 	return nil
 }
 
-func (b *Block) HeaderData() []byte {
+func (h *Header) Bytes() []byte {
 	buf := &bytes.Buffer{}
 	enc := gob.NewEncoder(buf)
-	enc.Encode(b.Header)
+	enc.Encode(h)
 
 	return buf.Bytes()
 }
