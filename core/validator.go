@@ -28,6 +28,12 @@ func (bv *BlockValidator) ValidateBlock(b *Block) error {
 		return fmt.Errorf("invalid block hash")
 	}
 
+	hash := BlockHasher{}.Hash(prevHeader)
+
+	if hash != b.Header.PrevBlockHash {
+		return fmt.Errorf("invalid hash of previous block")
+	}
+
 	if err := b.Verify(); err != nil {
 		return err
 	}

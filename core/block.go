@@ -11,11 +11,11 @@ import (
 )
 
 type Header struct {
-	Version      uint32
-	PrevlockHash types.Hash
-	TimeStamp    int64
-	Height       uint32
-	DataHash     types.Hash
+	Version       uint32
+	PrevBlockHash types.Hash
+	TimeStamp     int64
+	Height        uint32
+	DataHash      types.Hash
 }
 
 type Block struct {

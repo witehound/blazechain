@@ -11,10 +11,10 @@ import (
 
 func RandomBlock(height uint32) *Block {
 	h := &Header{
-		Version:      1,
-		PrevlockHash: types.RandomHash(),
-		Height:       height,
-		TimeStamp:    time.Now().UnixNano(),
+		Version:       1,
+		PrevBlockHash: types.RandomHash(),
+		Height:        height,
+		TimeStamp:     time.Now().UnixNano(),
 	}
 
 	txs := Transaction{
@@ -24,12 +24,18 @@ func RandomBlock(height uint32) *Block {
 	return NewBlock(Header(*h), []Transaction{txs})
 }
 
-func (bc *BlockChain) RandomBlockWithSig(height uint32) *Block {
-	b := RandomBlock(height)
+func (bc *BlockChain) RandomBlockWithSig(height uint32) (*Block, error) {
+
+	b, err := bc.BlockWithHash(height)
+
+	if err != nil {
+		return nil, err
+	}
+
 	privkey := crypto.GeneratePrivateKey()
 	b.Sign(privkey)
 
-	return b
+	return b, nil
 }
 
 func TestBlock_Signing(t *testing.T) {
