@@ -11,7 +11,7 @@ import (
 )
 
 type Signature struct {
-	r, s *big.Int
+	R, S *big.Int
 }
 
 type PrivateKey struct {
@@ -46,7 +46,7 @@ func (k *PrivateKey) Sign(data []byte) (*Signature, error) {
 	}
 
 	return &Signature{
-		r: r, s: s,
+		R: r, S: s,
 	}, nil
 }
 
@@ -60,5 +60,5 @@ func (k PublicKey) Address() types.Address {
 }
 
 func (s Signature) Verify(pub PublicKey, data []byte) bool {
-	return ecdsa.Verify(pub.Key, data, s.r, s.s)
+	return ecdsa.Verify(pub.Key, data, s.R, s.S)
 }

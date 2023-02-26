@@ -1,6 +1,7 @@
 package core
 
 import (
+	"bytes"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -38,4 +39,17 @@ func TestVerifyTx(t *testing.T) {
 
 	assert.NotNil(t, tx.VerifyTx())
 
+}
+
+func TestTxEncodeDecode(t *testing.T) {
+	privkey := crypto.GeneratePrivateKey()
+
+	tx := NewTransactionWithSig("foo")
+	buf := &bytes.Buffer{}
+	assert.Nil(t, tx.SignTx(privkey))
+
+	assert.Nil(t, tx.Encode(NewGobTxEncoder(buf)))
+	txDecoded := new(Transaction)
+	assert.Nil(t, txDecoded.Decode(NewGobTxDecoder(buf)))
+	assert.Equal(t, tx, txDecoded)
 }
