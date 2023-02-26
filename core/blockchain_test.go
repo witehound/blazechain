@@ -8,13 +8,15 @@ import (
 )
 
 func StartNewBlockChainWithGenesis(t *testing.T) *BlockChain {
+
 	bc, err := NewBlockChain(RandomBlock(0))
 	assert.Nil(t, err)
 
 	return bc
 }
 
-func (bc *BlockChain) BlockWithHash(height uint32) (*Block, error) {
+func (bc *BlockChain) BlockWithHash(t *testing.T, height uint32) (*Block, error) {
+
 	ph, err := bc.BlockHeader(height - 1)
 
 	if err != nil {
@@ -28,11 +30,9 @@ func (bc *BlockChain) BlockWithHash(height uint32) (*Block, error) {
 		TimeStamp:     time.Now().UnixNano(),
 	}
 
-	txs := Transaction{
-		Data: []byte("foo"),
-	}
+	txs := RandomTxwIthSig(t)
 
-	return NewBlock(Header(*h), []Transaction{txs}), nil
+	return NewBlock(Header(*h), []Transaction{*txs}), nil
 }
 
 func TestBlockChainInit(t *testing.T) {
@@ -52,7 +52,7 @@ func TestAddBlock(t *testing.T) {
 
 	for i := 0; i < 1000; i++ {
 		ct++
-		tb, err := bc.RandomBlockWithSig(uint32(i + 1))
+		tb, err := bc.RandomBlockWithSig(t, uint32(i+1))
 		assert.Nil(t, err)
 		bc.AddBlock(tb)
 	}
@@ -68,18 +68,18 @@ func TestValidator(t *testing.T) {
 
 	for i := 0; i < 10; i++ {
 		ct++
-		tb, err := bc.RandomBlockWithSig(uint32(i + 1))
+		tb, err := bc.RandomBlockWithSig(t, uint32(i+1))
 		assert.Nil(t, err)
 		bc.AddBlock(tb)
 	}
 
-	b1, err := bc.RandomBlockWithSig(ct + 1)
+	b1, err := bc.RandomBlockWithSig(t, ct+1)
 	assert.Nil(t, err)
 
 	assert.Nil(t, bc.AddBlock(b1))
 
-	b2, err2 := bc.RandomBlockWithSig(3)
-	b3, err3 := bc.RandomBlockWithSig(14)
+	b2, err2 := bc.RandomBlockWithSig(t, 3)
+	b3, err3 := bc.RandomBlockWithSig(t, 14)
 
 	assert.Nil(t, err2)
 	assert.NotNil(t, err3)
@@ -96,7 +96,7 @@ func TestBlockHeeder(t *testing.T) {
 
 	for i := 0; i < 1; i++ {
 		ct++
-		tb, err := bc.RandomBlockWithSig(uint32(i + 1))
+		tb, err := bc.RandomBlockWithSig(t, uint32(i+1))
 		assert.Nil(t, err)
 		bc.AddBlock(tb)
 		h, err := bc.BlockHeader(tb.Header.Height)

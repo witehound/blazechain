@@ -17,22 +17,20 @@ func RandomBlock(height uint32) *Block {
 		TimeStamp:     time.Now().UnixNano(),
 	}
 
-	txs := Transaction{
-		Data: []byte("foo"),
-	}
-
-	return NewBlock(Header(*h), []Transaction{txs})
+	return NewBlock(Header(*h), []Transaction{})
 }
 
-func (bc *BlockChain) RandomBlockWithSig(height uint32) (*Block, error) {
+func (bc *BlockChain) RandomBlockWithSig(t *testing.T, height uint32) (*Block, error) {
 
-	b, err := bc.BlockWithHash(height)
+	b, err := bc.BlockWithHash(t, height)
 
 	if err != nil {
 		return nil, err
 	}
 
 	privkey := crypto.GeneratePrivateKey()
+	tx := RandomTxwIthSig(t)
+	b.AddTransaction(tx)
 	b.Sign(privkey)
 
 	return b, nil
