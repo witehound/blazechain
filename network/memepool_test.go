@@ -13,7 +13,12 @@ func TestNewMemepool(t *testing.T) {
 
 	tx := core.NewTransactionWithSig("first")
 
-	assert.Nil(t, mp.AddTx(tx))
+	hash := tx.Hash(core.TxHasher{})
+
+	assert.Nil(t, mp.AddTx(hash, tx))
 
 	assert.Equal(t, mp.Len(), 1)
+
+	mp.Flush()
+	assert.Equal(t, mp.Len(), 0)
 }
