@@ -68,6 +68,8 @@ func (mp *MemePool) Has(h types.Hash) bool {
 	return ok
 }
 
-func (mp *MemePool) AllTransactions() []core.Transaction {
+func (mp *MemePool) AllTransactions() []*core.Transaction {
+	s := NewTxMapSorter(mp.Transactions)
 
+	return s.transactions
 }
