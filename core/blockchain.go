@@ -1,6 +1,10 @@
 package core
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/sirupsen/logrus"
+)
 
 type BlockChain struct {
 	Headers   []*Header
@@ -51,13 +55,18 @@ func (bc *BlockChain) HasBlock(height uint32) bool {
 func (bc *BlockChain) AddBlockWithoutValidator(b *Block) error {
 
 	bc.Headers = append(bc.Headers, &b.Header)
+
+	logrus.WithField("fields", logrus.Fields{
+		"height": b.Header.Height,
+		"hash":   BlockHasher{}.Hash(&b.Header),
+	}).Info("addedd new block")
 	return bc.Store.Put(b)
 
 }
 
 func (bc *BlockChain) BlockHeader(h uint32) (*Header, error) {
 	if !bc.HasBlock(h) {
-		return nil, fmt.Errorf("invalid block height : %d", h)
+		return nil, fmt.Errorf("block to high : %d", h)
 	}
 	return bc.Headers[h], nil
 }
