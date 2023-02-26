@@ -30,7 +30,7 @@ func (bc *BlockChain) BlockWithHash(t *testing.T, height uint32) (*Block, error)
 		TimeStamp:     time.Now().UnixNano(),
 	}
 
-	txs := RandomTxwIthSig(t)
+	txs := NewTransactionWithSig("foo")
 
 	return NewBlock(Header(*h), []Transaction{*txs}), nil
 }

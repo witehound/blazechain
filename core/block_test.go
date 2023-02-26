@@ -29,7 +29,7 @@ func (bc *BlockChain) RandomBlockWithSig(t *testing.T, height uint32) (*Block, e
 	}
 
 	privkey := crypto.GeneratePrivateKey()
-	tx := RandomTxwIthSig(t)
+	tx := NewTransactionWithSig("food")
 	b.AddTransaction(tx)
 	b.Sign(privkey)
 

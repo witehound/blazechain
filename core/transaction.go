@@ -39,3 +39,15 @@ func (tx *Transaction) VerifyTx() error {
 func (tx *Transaction) Hash(hasher Hasher[*Transaction]) types.Hash {
 	return hasher.Hash(tx)
 }
+
+func NewTransactionWithSig(data string) *Transaction {
+	privkey := crypto.GeneratePrivateKey()
+	tx := &Transaction{
+		Data: []byte(data),
+	}
+
+	tx.SignTx(privkey)
+
+	return tx
+
+}

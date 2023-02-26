@@ -15,7 +15,6 @@ func NewMemePool() *MemePool {
 	return &MemePool{
 		Transactions: make(map[types.Hash]*core.Transaction),
 	}
-
 }
 
 func (mp *MemePool) Len() int {
