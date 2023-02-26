@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/witehound/blazechain/crypto"
+	"github.com/witehound/blazechain/types"
 )
 
 type Transaction struct {
@@ -33,4 +34,8 @@ func (tx *Transaction) VerifyTx() error {
 	}
 
 	return nil
+}
+
+func (tx *Transaction) Hash(hasher Hasher[*Transaction]) types.Hash {
+	return hasher.Hash(tx)
 }
