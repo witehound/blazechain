@@ -47,7 +47,7 @@ func NewDefaultRPCHandler(p RPCProcessor) *DefaultRPCHandler {
 func (rh *DefaultRPCHandler) HandleRPC(rpc RPC) error {
 	msg := Message{}
 	if err := gob.NewDecoder(rpc.Payload).Decode(&msg); err != nil {
-		return err
+		return fmt.Errorf("failed to decode message from this pair %s : %s", rpc.Payload, err)
 	}
 
 	switch msg.Header {
@@ -61,4 +61,18 @@ func (rh *DefaultRPCHandler) HandleRPC(rpc RPC) error {
 		return fmt.Errorf("invalid message header")
 	}
 
+}
+
+func NewMessage(t MessageType, data []byte) *Message {
+	return &Message{
+		Header: t,
+		Data:   data,
+	}
+}
+
+func (msg *Message) Bytes() []byte {
+
+	buf := &bytes.Buffer{}
+	gob.NewEncoder(buf).Encode(msg)
+	return buf.Bytes()
 }

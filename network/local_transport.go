@@ -13,7 +13,7 @@ type LocalTransport struct {
 	consumeChan chan RPC
 }
 
-func NewLocalTransport(addr NetAdd) *LocalTransport {
+func NewLocalTransport(addr NetAdd) Transport {
 	return &LocalTransport{
 		addr:        addr,
 		consumeChan: make(chan RPC, 1024),
@@ -25,11 +25,11 @@ func (t *LocalTransport) Consume() <-chan RPC {
 	return t.consumeChan
 }
 
-func (t *LocalTransport) Connet(tr *LocalTransport) error {
+func (t *LocalTransport) Connect(tr Transport) error {
 	t.lock.Lock()
 	defer t.lock.Unlock()
 
-	t.peers[tr.Addr()] = tr
+	t.peers[tr.Addr()] = tr.(*LocalTransport)
 
 	return nil
 }
@@ -38,15 +38,13 @@ func (t *LocalTransport) SendMessage(to NetAdd, payLoad []byte) error {
 	t.lock.RLock()
 	defer t.lock.RUnlock()
 
-	buf := &bytes.Buffer{}
-
 	peer, ok := t.peers[to]
 	if !ok {
 		return fmt.Errorf("%s, Could not send message to person %s", t.addr, to)
 	}
 	peer.consumeChan <- RPC{
 		From:    t.addr,
-		Payload: buf,
+		Payload: bytes.NewReader(payLoad),
 	}
 	return nil
 }
