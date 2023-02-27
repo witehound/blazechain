@@ -8,7 +8,7 @@ import (
 
 type Hash [32]uint8
 
-func (h *Hash) FindCachedHash() bool {
+func (h Hash) IsZero() bool {
 	for i := 0; i < 32; i++ {
 		if h[i] != 0 {
 			return false
@@ -17,7 +17,7 @@ func (h *Hash) FindCachedHash() bool {
 	return true
 }
 
-func (h *Hash) ToSlice() []byte {
+func (h Hash) ToSlice() []byte {
 	b := make([]byte, 32)
 	for i := 0; i < 32; i++ {
 		b[i] = h[i]
@@ -25,18 +25,17 @@ func (h *Hash) ToSlice() []byte {
 	return b
 }
 
-func (h *Hash) String() string {
+func (h Hash) String() string {
 	return hex.EncodeToString(h.ToSlice())
 }
 
-func HashFromByte(b []byte) Hash {
+func HashFromBytes(b []byte) Hash {
 	if len(b) != 32 {
-		msg := fmt.Sprintf("length should be 32 bubt got %d", len(b))
+		msg := fmt.Sprintf("given bytes with length %d should be 32", len(b))
 		panic(msg)
 	}
 
 	var value [32]uint8
-
 	for i := 0; i < 32; i++ {
 		value[i] = b[i]
 	}
@@ -44,12 +43,12 @@ func HashFromByte(b []byte) Hash {
 	return Hash(value)
 }
 
-func RandomByte(size int) []byte {
+func RandomBytes(size int) []byte {
 	token := make([]byte, size)
 	rand.Read(token)
 	return token
 }
 
 func RandomHash() Hash {
-	return HashFromByte(RandomByte(32))
+	return HashFromBytes(RandomBytes(32))
 }

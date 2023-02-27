@@ -76,7 +76,7 @@ func (s *Server) ProcessTransaction(from NetAdd, tx *core.Transaction) error {
 	hash := tx.Hash(core.TxHasher{})
 
 	if s.MemePool.Has(hash) {
-		logrus.WithField("HandleTransaction", logrus.Fields{
+		logrus.WithFields(logrus.Fields{
 			"hash": hash,
 		}).Info("tx already in the memepool")
 		return nil
@@ -88,8 +88,9 @@ func (s *Server) ProcessTransaction(from NetAdd, tx *core.Transaction) error {
 
 	tx.SetFirstSeen(time.Now().UnixNano())
 
-	logrus.WithField("HandleTransaction", logrus.Fields{
-		"hash": hash,
+	logrus.WithFields(logrus.Fields{
+		"hash":             hash,
+		"memepool lenggth": s.MemePool.Len(),
 	}).Info("adding new tx  to memepool")
 
 	return s.MemePool.AddTx(hash, tx)

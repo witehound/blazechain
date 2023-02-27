@@ -26,7 +26,7 @@ type Block struct {
 }
 
 func (b *Block) Hash(hasher Hasher[*Header]) types.Hash {
-	if b.hash.FindCachedHash() {
+	if b.hash.IsZero() {
 		b.hash = hasher.Hash(&b.Header)
 	}
 

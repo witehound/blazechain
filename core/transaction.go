@@ -39,7 +39,7 @@ func (tx *Transaction) VerifyTx() error {
 }
 
 func (tx *Transaction) Hash(hasher Hasher[*Transaction]) types.Hash {
-	if tx.hash.FindCachedHash() {
+	if tx.hash.IsZero() {
 		tx.hash = hasher.Hash(tx)
 	}
 	return tx.hash
