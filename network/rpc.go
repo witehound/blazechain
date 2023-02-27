@@ -1,6 +1,13 @@
 package network
 
-import "github.com/witehound/blazechain/core"
+import (
+	"bytes"
+	"encoding/gob"
+	"fmt"
+	"io"
+
+	"github.com/witehound/blazechain/core"
+)
 
 type MessageType byte
 
@@ -11,7 +18,7 @@ const (
 
 type RPC struct {
 	From    NetAdd
-	Payload []byte
+	Payload io.Reader
 }
 
 type Message struct {
@@ -29,4 +36,29 @@ type RPCProcessor interface {
 
 type DefaultRPCHandler struct {
 	p RPCProcessor
+}
+
+func NewDefaultRPCHandler(p RPCProcessor) *DefaultRPCHandler {
+	return &DefaultRPCHandler{
+		p: p,
+	}
+}
+
+func (rh *DefaultRPCHandler) HandleRPC(rpc RPC) error {
+	msg := Message{}
+	if err := gob.NewDecoder(rpc.Payload).Decode(&msg); err != nil {
+		return err
+	}
+
+	switch msg.Header {
+	case MessageTypeTx:
+		tx := new(core.Transaction)
+		if err := tx.Decode(core.NewGobTxDecoder(bytes.NewReader(msg.Data))); err != nil {
+			return nil
+		}
+		return rh.p.ProcessTransaction(rpc.From, tx)
+	default:
+		return fmt.Errorf("invalid message header")
+	}
+
 }

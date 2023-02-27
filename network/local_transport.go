@@ -1,6 +1,7 @@
 package network
 
 import (
+	"bytes"
 	"fmt"
 	"sync"
 )
@@ -37,13 +38,15 @@ func (t *LocalTransport) SendMessage(to NetAdd, payLoad []byte) error {
 	t.lock.RLock()
 	defer t.lock.RUnlock()
 
+	buf := &bytes.Buffer{}
+
 	peer, ok := t.peers[to]
 	if !ok {
 		return fmt.Errorf("%s, Could not send message to person %s", t.addr, to)
 	}
 	peer.consumeChan <- RPC{
 		From:    t.addr,
-		Payload: payLoad,
+		Payload: buf,
 	}
 	return nil
 }
