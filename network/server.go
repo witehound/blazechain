@@ -12,10 +12,11 @@ import (
 var defaultBlockTime = 5 * time.Second
 
 type ServerOpts struct {
-	Transports []Transport
-	PrivateKey *crypto.PrivateKey
-	BlockTime  time.Duration
-	RPCHandler
+	Transports    []Transport
+	PrivateKey    *crypto.PrivateKey
+	BlockTime     time.Duration
+	RPCDecodeFunc RPCDecodeFunc
+	RPCProcessor  RPCProcessor
 }
 
 type Server struct {
@@ -24,7 +25,6 @@ type Server struct {
 	rpcCh       chan RPC
 	quitCh      chan struct{}
 	MemePool    *MemePool
-	BlockTime   time.Duration
 }
 
 func NewServer(opts ServerOpts) *Server {
@@ -33,17 +33,20 @@ func NewServer(opts ServerOpts) *Server {
 		opts.BlockTime = defaultBlockTime
 	}
 
+	if opts.RPCDecodeFunc == nil {
+		opts.RPCDecodeFunc = DefaultRPCDecodeFunc
+	}
+
 	s := &Server{
 		ServerOpts:  opts,
 		rpcCh:       make(chan RPC),
 		isValidator: opts.PrivateKey != nil,
 		quitCh:      make(chan struct{}, 1),
 		MemePool:    NewMemePool(),
-		BlockTime:   opts.BlockTime,
 	}
 
-	if opts.RPCHandler == nil {
-		s.ServerOpts.RPCHandler = NewDefaultRPCHandler(s)
+	if s.ServerOpts.RPCProcessor == nil {
+		s.ServerOpts.RPCProcessor = s
 	}
 
 	return s
@@ -57,7 +60,11 @@ free:
 	for {
 		select {
 		case rpc := <-s.rpcCh:
-			if err := s.RPCHandler.HandleRPC(rpc); err != nil {
+			msg, err := s.RPCDecodeFunc(rpc)
+			if err != nil {
+				logrus.Error(err)
+			}
+			if err := s.RPCProcessor.ProcessMessage(msg); err != nil {
 				logrus.Error(err)
 			}
 		case <-s.quitCh:
@@ -72,7 +79,7 @@ free:
 	fmt.Println("Server Shutdown")
 }
 
-func (s *Server) ProcessTransaction(from NetAdd, tx *core.Transaction) error {
+func (s *Server) ProcessTransaction(tx *core.Transaction) error {
 	hash := tx.Hash(core.TxHasher{})
 
 	if s.MemePool.Has(hash) {
@@ -112,4 +119,14 @@ func (s *Server) InitTransports() {
 			}
 		}(tr)
 	}
+}
+
+func (s *Server) ProcessMessage(msg *DecodedMsg) error {
+	switch t := msg.Data.(type) {
+	case *core.Transaction:
+		return s.ProcessTransaction(t)
+	}
+
+	return nil
+
 }
