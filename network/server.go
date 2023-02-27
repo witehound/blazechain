@@ -125,6 +125,7 @@ func (s *Server) InitTransports() {
 }
 
 func (s *Server) ProcessMessage(msg *DecodedMsg) error {
+
 	switch t := msg.Data.(type) {
 	case *core.Transaction:
 		return s.ProcessTransaction(t)

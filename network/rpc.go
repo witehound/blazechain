@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/sirupsen/logrus"
 	"github.com/witehound/blazechain/core"
 )
 
@@ -43,6 +44,11 @@ func DefaultRPCDecodeFunc(rpc RPC) (*DecodedMsg, error) {
 	if err := gob.NewDecoder(rpc.Payload).Decode(&msg); err != nil {
 		return nil, fmt.Errorf("failed to decode message from this pair %s : %s", rpc.Payload, err)
 	}
+
+	logrus.WithFields(logrus.Fields{
+		"from": rpc.From,
+		"type": msg.Header,
+	}).Info("incoming message")
 
 	switch msg.Header {
 	case MessageTypeTx:
