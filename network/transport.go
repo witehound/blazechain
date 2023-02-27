@@ -7,4 +7,5 @@ type Transport interface {
 	Consume() <-chan RPC
 	SendMessage(NetAdd, []byte) error
 	Addr() NetAdd
+	BroadCast([]byte) error
 }
