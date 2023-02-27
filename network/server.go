@@ -1,6 +1,7 @@
 package network
 
 import (
+	"bytes"
 	"crypto"
 	"fmt"
 	"time"
@@ -100,6 +101,8 @@ func (s *Server) ProcessTransaction(tx *core.Transaction) error {
 		"memepool lenggth": s.MemePool.Len(),
 	}).Info("adding new tx  to memepool")
 
+	go s.BroadCastTx(tx)
+
 	return s.MemePool.AddTx(hash, tx)
 }
 
@@ -128,5 +131,24 @@ func (s *Server) ProcessMessage(msg *DecodedMsg) error {
 	}
 
 	return nil
+}
 
+func (s *Server) BroadCasting(msg []byte) error {
+	for _, tr := range s.Transports {
+		if err := tr.BroadCast(msg); err != nil {
+			logrus.Error(err)
+			return err
+		}
+	}
+	return nil
+}
+
+func (s *Server) BroadCastTx(tx *core.Transaction) error {
+	buf := &bytes.Buffer{}
+	if err := tx.Encode(core.NewGobTxEncoder(buf)); err != nil {
+		return err
+	}
+
+	msg := NewMessage(MessageTypeTx, buf.Bytes())
+	return s.BroadCasting(msg.Bytes())
 }
