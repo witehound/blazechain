@@ -4,7 +4,10 @@ import (
 	"bytes"
 	"crypto"
 	"fmt"
+	"os"
 	"time"
+
+	"github.com/go-kit/log"
 
 	"github.com/sirupsen/logrus"
 	"github.com/witehound/blazechain/core"
@@ -14,10 +17,12 @@ var defaultBlockTime = 5 * time.Second
 
 type ServerOpts struct {
 	Transports    []Transport
-	PrivateKey    *crypto.PrivateKey
+	PrivateKey    crypto.PrivateKey
 	BlockTime     time.Duration
 	RPCDecodeFunc RPCDecodeFunc
 	RPCProcessor  RPCProcessor
+	Logger        log.Logger
+	ID            string
 }
 
 type Server struct {
@@ -36,6 +41,11 @@ func NewServer(opts ServerOpts) *Server {
 
 	if opts.RPCDecodeFunc == nil {
 		opts.RPCDecodeFunc = DefaultRPCDecodeFunc
+	}
+
+	if opts.Logger == nil {
+		opts.Logger = log.NewLogfmtLogger(os.Stderr)
+		opts.Logger = log.With(opts.Logger, "ID", opts.ID)
 	}
 
 	s := &Server{
@@ -66,10 +76,10 @@ free:
 		case rpc := <-s.rpcCh:
 			msg, err := s.RPCDecodeFunc(rpc)
 			if err != nil {
-				logrus.Error(err)
+				s.Logger.Log("error", err)
 			}
 			if err := s.RPCProcessor.ProcessMessage(msg); err != nil {
-				logrus.Error(err)
+				s.Logger.Log("error", err)
 			}
 		case <-s.quitCh:
 			break free
@@ -77,16 +87,14 @@ free:
 		}
 	}
 
-	fmt.Println("Server Shutdown")
+	s.Logger.Log("msg", "server is shutting down")
 }
 
 func (s *Server) ProcessTransaction(tx *core.Transaction) error {
 	hash := tx.Hash(core.TxHasher{})
 
 	if s.MemePool.Has(hash) {
-		logrus.WithFields(logrus.Fields{
-			"hash": hash,
-		}).Info("tx already in the memepool")
+
 		return nil
 	}
 
@@ -96,10 +104,9 @@ func (s *Server) ProcessTransaction(tx *core.Transaction) error {
 
 	tx.SetFirstSeen(time.Now().UnixNano())
 
-	logrus.WithFields(logrus.Fields{
-		"hash":             hash,
-		"memepool lenggth": s.MemePool.Len(),
-	}).Info("adding new tx  to memepool")
+	s.Logger.Log("msg", "adding new tx  to memepool",
+		"hash", hash,
+		"memepool length", s.MemePool.Len())
 
 	go s.BroadCastTx(tx)
 
@@ -156,6 +163,9 @@ func (s *Server) BroadCastTx(tx *core.Transaction) error {
 
 func (s *Server) Validator() {
 	ticker := time.NewTicker(s.BlockTime)
+
+	s.Logger.Log("msg", "starting validator loop", "blocktime", s.BlockTime)
+
 	for {
 		<-ticker.C
 		s.CreateNewBlock()

@@ -2,12 +2,14 @@ package main
 
 import (
 	"bytes"
+
 	"math/rand"
 	"strconv"
 	"time"
 
 	"github.com/sirupsen/logrus"
 	"github.com/witehound/blazechain/core"
+	"github.com/witehound/blazechain/crypto"
 	"github.com/witehound/blazechain/network"
 )
 
@@ -28,8 +30,12 @@ func main() {
 		}
 	}()
 
+	privKey := crypto.GeneratePrivateKey()
+
 	opts := network.ServerOpts{
+		PrivateKey: privKey,
 		Transports: []network.Transport{trLocal},
+		ID:         "LOCAL",
 	}
 
 	s := network.NewServer(opts)
