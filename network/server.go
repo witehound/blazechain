@@ -144,7 +144,7 @@ func (s *Server) CreateNewBlock() error {
 	}
 
 	if err := s.Chain.AddBlock(block); err != nil {
-		logrus.Error(err)
+
 		return err
 	}
 
