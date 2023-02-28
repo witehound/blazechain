@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -17,7 +18,9 @@ func RandomBlock(height uint32) *Block {
 		TimeStamp:     time.Now().UnixNano(),
 	}
 
-	return NewBlock(Header(*h), []Transaction{})
+	tx := NewTransactionWithSig("food")
+
+	return NewBlock(Header(*h), []Transaction{*tx})
 }
 
 func (bc *BlockChain) RandomBlockWithSig(t *testing.T, height uint32) (*Block, error) {
@@ -31,7 +34,16 @@ func (bc *BlockChain) RandomBlockWithSig(t *testing.T, height uint32) (*Block, e
 	privkey := crypto.GeneratePrivateKey()
 	tx := NewTransactionWithSig("food")
 	b.AddTransaction(tx)
-	b.Sign(privkey)
+
+	fmt.Println(b.Transactions)
+
+	dataHash, err := CalculateDataHash(b.Transactions)
+
+	assert.Nil(t, err)
+
+	b.Header.DataHash = dataHash
+
+	assert.Nil(t, b.Sign(privkey))
 
 	return b, nil
 }
@@ -48,6 +60,11 @@ func TestBlock_Signing(t *testing.T) {
 func TestBlock_Verifying(t *testing.T) {
 	privkey := crypto.GeneratePrivateKey()
 	b := RandomBlock(0)
+
+	dataHash, err := CalculateDataHash(b.Transactions)
+
+	assert.Nil(t, err)
+	b.Header.DataHash = dataHash
 
 	assert.Nil(t, b.Sign(privkey))
 

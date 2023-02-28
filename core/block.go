@@ -2,6 +2,7 @@ package core
 
 import (
 	"bytes"
+	"crypto/sha256"
 	"encoding/gob"
 	"fmt"
 
@@ -80,6 +81,16 @@ func (b *Block) Verify() error {
 		}
 	}
 
+	dataHash, err := CalculateDataHash(b.Transactions)
+
+	if err != nil {
+		return err
+	}
+
+	if dataHash != b.Header.DataHash {
+		return fmt.Errorf("block has invalid transaction datahash")
+	}
+
 	return nil
 }
 
@@ -89,4 +100,19 @@ func (h *Header) Bytes() []byte {
 	enc.Encode(h)
 
 	return buf.Bytes()
+}
+
+func CalculateDataHash(tsx []Transaction) (hash types.Hash, err error) {
+	var (
+		buf = &bytes.Buffer{}
+	)
+
+	for _, tx := range tsx {
+		if err = tx.Encode(NewGobTxEncoder(buf)); err != nil {
+			return
+		}
+	}
+
+	hash = sha256.Sum256(buf.Bytes())
+	return
 }
