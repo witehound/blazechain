@@ -37,6 +37,8 @@ func (bc *BlockChain) AddBlock(b *Block) error {
 		return fmt.Errorf("invalid block type")
 	}
 
+	
+
 	if err := bc.Validator.ValidateBlock(b); err != nil {
 		return err
 	}

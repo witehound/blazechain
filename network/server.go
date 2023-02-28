@@ -144,7 +144,6 @@ func (s *Server) CreateNewBlock() error {
 	}
 
 	if err := s.Chain.AddBlock(block); err != nil {
-
 		return err
 	}
 
