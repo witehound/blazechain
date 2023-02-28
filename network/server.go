@@ -2,7 +2,7 @@ package network
 
 import (
 	"bytes"
-	"crypto"
+
 	"fmt"
 	"os"
 	"time"
@@ -11,13 +11,14 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/witehound/blazechain/core"
+	"github.com/witehound/blazechain/crypto"
 )
 
 var defaultBlockTime = 5 * time.Second
 
 type ServerOpts struct {
 	Transports    []Transport
-	PrivateKey    crypto.PrivateKey
+	PrivateKey    *crypto.PrivateKey
 	BlockTime     time.Duration
 	RPCDecodeFunc RPCDecodeFunc
 	RPCProcessor  RPCProcessor
@@ -49,10 +50,21 @@ func NewServer(opts ServerOpts) (*Server, error) {
 		opts.Logger = log.With(opts.Logger, "ID", opts.ID)
 	}
 
-	chain, err := core.NewBlockChain(new(core.Block))
+	var chain *core.BlockChain
 
-	if err != nil {
-		return nil, err
+	if opts.PrivateKey != nil {
+		bc, err := core.StartNewBlockChainWithGenesis(*opts.PrivateKey)
+		if err != nil {
+			return nil, err
+		}
+		chain = bc
+	} else {
+		privkey := crypto.GeneratePrivateKey()
+		bc, err := core.StartNewBlockChainWithGenesis(privkey)
+		if err != nil {
+			return nil, err
+		}
+		chain = bc
 	}
 
 	s := &Server{

@@ -3,25 +3,10 @@ package core
 import (
 	"fmt"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/witehound/blazechain/crypto"
-	"github.com/witehound/blazechain/types"
 )
-
-func RandomBlock(height uint32) *Block {
-	h := &Header{
-		Version:       1,
-		PrevBlockHash: types.RandomHash(),
-		Height:        height,
-		TimeStamp:     time.Now().UnixNano(),
-	}
-
-	tx := NewTransactionWithSig("food")
-
-	return NewBlock(Header(*h), []Transaction{*tx})
-}
 
 func (bc *BlockChain) RandomBlockWithSig(t *testing.T, height uint32) (*Block, error) {
 

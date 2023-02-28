@@ -8,30 +8,6 @@ import (
 	"github.com/witehound/blazechain/crypto"
 )
 
-func StartNewBlockChainWithGenesis() (*BlockChain, error) {
-	privkey := crypto.GeneratePrivateKey()
-
-	b := RandomBlock(0)
-
-	dataHash, err := CalculateDataHash(b.Transactions)
-
-	if err != nil {
-		return nil, err
-	}
-
-	b.Header.DataHash = dataHash
-
-	b.Sign(privkey)
-
-	bc, err := NewBlockChain(b)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return bc, nil
-}
-
 func (bc *BlockChain) BlockWithHash(t *testing.T, height uint32) (*Block, error) {
 
 	ph, err := bc.BlockHeader(height - 1)
@@ -53,8 +29,9 @@ func (bc *BlockChain) BlockWithHash(t *testing.T, height uint32) (*Block, error)
 }
 
 func TestBlockChainInit(t *testing.T) {
+	privkey := crypto.GeneratePrivateKey()
 
-	bc, err := StartNewBlockChainWithGenesis()
+	bc, err := StartNewBlockChainWithGenesis(privkey)
 
 	assert.Nil(t, err)
 
@@ -64,7 +41,9 @@ func TestBlockChainInit(t *testing.T) {
 }
 
 func TestAddBlock(t *testing.T) {
-	bc, err := StartNewBlockChainWithGenesis()
+	privkey := crypto.GeneratePrivateKey()
+
+	bc, err := StartNewBlockChainWithGenesis(privkey)
 
 	assert.Nil(t, err)
 
@@ -82,7 +61,9 @@ func TestAddBlock(t *testing.T) {
 }
 
 func TestValidator(t *testing.T) {
-	bc, err := StartNewBlockChainWithGenesis()
+	privkey := crypto.GeneratePrivateKey()
+
+	bc, err := StartNewBlockChainWithGenesis(privkey)
 
 	assert.Nil(t, err)
 
@@ -113,7 +94,9 @@ func TestValidator(t *testing.T) {
 }
 
 func TestBlockHeeder(t *testing.T) {
-	bc, err := StartNewBlockChainWithGenesis()
+	privkey := crypto.GeneratePrivateKey()
+
+	bc, err := StartNewBlockChainWithGenesis(privkey)
 
 	assert.Nil(t, err)
 
