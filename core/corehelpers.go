@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/go-kit/log"
@@ -16,6 +17,8 @@ func StartNewBlockChainWithGenesis(privKey crypto.PrivateKey) (*BlockChain, erro
 	}
 
 	b.Sign(privKey)
+
+	fmt.Println(b)
 
 	bc, err := NewBlockChain(b)
 
@@ -57,13 +60,6 @@ func GenesisBlock() (*Block, error) {
 	}
 
 	return b, nil
-}
-
-func CheckOptsToSignBlock(key *crypto.PrivateKey) crypto.PrivateKey {
-	if key != nil {
-		return crypto.GeneratePrivateKey()
-	}
-	return *key
 }
 
 func StartNewBlockChainGenesisLogger(privKey crypto.PrivateKey, logger log.Logger) (*BlockChain, error) {

@@ -51,14 +51,20 @@ func NewServer(opts ServerOpts) (*Server, error) {
 
 	var chain *core.BlockChain
 
-	privKey := core.CheckOptsToSignBlock(opts.PrivateKey)
-
-	bc, err := core.StartNewBlockChainGenesisLogger(privKey, opts.Logger)
-
-	if err != nil {
-		return nil, err
+	if opts.PrivateKey == nil {
+		priv := crypto.GeneratePrivateKey()
+		bc, err := core.StartNewBlockChainGenesisLogger(priv, opts.Logger)
+		if err != nil {
+			return nil, err
+		}
+		chain = bc
+	} else {
+		bc, err := core.StartNewBlockChainGenesisLogger(*opts.PrivateKey, opts.Logger)
+		if err != nil {
+			return nil, err
+		}
+		chain = bc
 	}
-	chain = bc
 
 	s := &Server{
 		ServerOpts:  opts,
@@ -140,9 +146,7 @@ func (s *Server) CreateNewBlock() error {
 		return err
 	}
 
-	privKey := core.CheckOptsToSignBlock(s.ServerOpts.PrivateKey)
-
-	if err := block.Sign(privKey); err != nil {
+	if err := block.Sign(*s.ServerOpts.PrivateKey); err != nil {
 		return err
 	}
 

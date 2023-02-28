@@ -2,12 +2,12 @@ package main
 
 import (
 	"bytes"
+	"fmt"
+	"log"
 
 	"math/rand"
 	"strconv"
-	"time"
 
-	"github.com/sirupsen/logrus"
 	"github.com/witehound/blazechain/core"
 	"github.com/witehound/blazechain/crypto"
 	"github.com/witehound/blazechain/network"
@@ -15,36 +15,21 @@ import (
 
 func main() {
 	trLocal := network.NewLocalTransport("LOCAL")
-	trRemote := network.NewLocalTransport("REMOTE")
+	trRemoteA := network.NewLocalTransport("REMOTE_A")
+	trRemoteB := network.NewLocalTransport("REMOTE_B")
+	trRemoteC := network.NewLocalTransport("REMOTE_C")
 
-	trLocal.Connect(trRemote)
-	trRemote.Connect(trLocal)
+	trLocal.Connect(trRemoteA)
+	trRemoteA.Connect(trRemoteB)
+	trRemoteB.Connect(trRemoteC)
 
-	go func() {
-		for {
-			// trRemote.SendMessage(trLocal.Addr(), []byte("hello world"))
-			if err := SendTransaction(trRemote, trLocal.Addr()); err != nil {
-				logrus.Error(err)
-			}
-			time.Sleep(1 * time.Second)
-		}
-	}()
+	MakeRemoteServers([]network.Transport{trRemoteA, trRemoteB, trRemoteC})
 
 	privKey := crypto.GeneratePrivateKey()
 
-	opts := network.ServerOpts{
-		PrivateKey: &privKey,
-		Transports: []network.Transport{trLocal},
-		ID:         "LOCAL",
-	}
+	loacalServer := MakeServer("LOCAL", trLocal, &privKey)
 
-	s, err := network.NewServer(opts)
-
-	if err != nil {
-		logrus.Error(err)
-	}
-
-	s.Start()
+	loacalServer.Start()
 
 }
 
@@ -61,4 +46,28 @@ func SendTransaction(tr network.Transport, to network.NetAdd) error {
 
 	return tr.SendMessage(to, msg.Bytes())
 
+}
+
+func MakeServer(id string, tr network.Transport, privKey *crypto.PrivateKey) *network.Server {
+	opts := network.ServerOpts{
+		PrivateKey: privKey,
+		Transports: []network.Transport{tr},
+		ID:         id,
+	}
+
+	s, err := network.NewServer(opts)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return s
+}
+
+func MakeRemoteServers(trs []network.Transport) *network.Server {
+	for i := 0; i < len(trs); i++ {
+		id := fmt.Sprintf("REMOTE_%d", i+1)
+		server := MakeServer(id, trs[i], nil)
+		go server.Start()
+	}
+	return nil
 }

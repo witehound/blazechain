@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/go-kit/log"
+	"github.com/sirupsen/logrus"
 )
 
 type BlockChain struct {
@@ -62,11 +63,10 @@ func (bc *BlockChain) AddBlockWithoutValidator(b *Block) error {
 	bc.Headers = append(bc.Headers, &b.Header)
 	bc.Lock.RUnlock()
 
-	bc.Logger.Log(
-		"msg", "adding new block",
-		"hash", b.Hash(BlockHasher{}),
-		"height", b.Header.Height,
-	)
+	logrus.WithFields(logrus.Fields{
+		"height": b.Header.Height,
+		"hash":   BlockHasher{}.Hash(&b.Header),
+	}).Info("addedd new block")
 
 	return bc.Store.Put(b)
 

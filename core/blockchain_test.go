@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -37,9 +38,13 @@ func (bc *BlockChain) BlockWithHash(t *testing.T, height uint32) (*Block, error)
 func TestBlockChainInit(t *testing.T) {
 	privkey := crypto.GeneratePrivateKey()
 
+	assert.NotNil(t, privkey)
+
 	bc, err := StartNewBlockChainWithGenesis(privkey)
 
 	assert.Nil(t, err)
+
+	fmt.Println(bc)
 
 	assert.NotNil(t, bc.Validator)
 
