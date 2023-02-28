@@ -5,14 +5,31 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/witehound/blazechain/crypto"
 )
 
-func StartNewBlockChainWithGenesis(t *testing.T) *BlockChain {
+func StartNewBlockChainWithGenesis() (*BlockChain, error) {
+	privkey := crypto.GeneratePrivateKey()
 
-	bc, err := NewBlockChain(RandomBlock(0))
-	assert.Nil(t, err)
+	b := RandomBlock(0)
 
-	return bc
+	dataHash, err := CalculateDataHash(b.Transactions)
+
+	if err != nil {
+		return nil, err
+	}
+
+	b.Header.DataHash = dataHash
+
+	b.Sign(privkey)
+
+	bc, err := NewBlockChain(b)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return bc, nil
 }
 
 func (bc *BlockChain) BlockWithHash(t *testing.T, height uint32) (*Block, error) {
@@ -37,7 +54,9 @@ func (bc *BlockChain) BlockWithHash(t *testing.T, height uint32) (*Block, error)
 
 func TestBlockChainInit(t *testing.T) {
 
-	bc := StartNewBlockChainWithGenesis(t)
+	bc, err := StartNewBlockChainWithGenesis()
+
+	assert.Nil(t, err)
 
 	assert.NotNil(t, bc.Validator)
 
@@ -45,7 +64,9 @@ func TestBlockChainInit(t *testing.T) {
 }
 
 func TestAddBlock(t *testing.T) {
-	bc := StartNewBlockChainWithGenesis(t)
+	bc, err := StartNewBlockChainWithGenesis()
+
+	assert.Nil(t, err)
 
 	assert.NotNil(t, bc.Validator)
 	var ct uint32 = 0
@@ -61,7 +82,9 @@ func TestAddBlock(t *testing.T) {
 }
 
 func TestValidator(t *testing.T) {
-	bc := StartNewBlockChainWithGenesis(t)
+	bc, err := StartNewBlockChainWithGenesis()
+
+	assert.Nil(t, err)
 
 	assert.NotNil(t, bc.Validator)
 	var ct uint32 = 0
@@ -90,7 +113,9 @@ func TestValidator(t *testing.T) {
 }
 
 func TestBlockHeeder(t *testing.T) {
-	bc := StartNewBlockChainWithGenesis(t)
+	bc, err := StartNewBlockChainWithGenesis()
+
+	assert.Nil(t, err)
 
 	var ct uint32 = 0
 

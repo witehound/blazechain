@@ -38,7 +38,12 @@ func main() {
 		ID:         "LOCAL",
 	}
 
-	s := network.NewServer(opts)
+	s, err := network.NewServer(opts)
+
+	if err != nil {
+		logrus.Error(err)
+	}
+
 	s.Start()
 
 }

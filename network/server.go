@@ -31,9 +31,10 @@ type Server struct {
 	rpcCh       chan RPC
 	quitCh      chan struct{}
 	MemePool    *MemePool
+	Chain       *core.BlockChain
 }
 
-func NewServer(opts ServerOpts) *Server {
+func NewServer(opts ServerOpts) (*Server, error) {
 
 	if opts.BlockTime == time.Duration(0) {
 		opts.BlockTime = defaultBlockTime
@@ -48,12 +49,19 @@ func NewServer(opts ServerOpts) *Server {
 		opts.Logger = log.With(opts.Logger, "ID", opts.ID)
 	}
 
+	chain, err := core.NewBlockChain(new(core.Block))
+
+	if err != nil {
+		return nil, err
+	}
+
 	s := &Server{
 		ServerOpts:  opts,
 		rpcCh:       make(chan RPC),
 		isValidator: opts.PrivateKey != nil,
 		quitCh:      make(chan struct{}, 1),
 		MemePool:    NewMemePool(),
+		Chain:       chain,
 	}
 
 	if s.ServerOpts.RPCProcessor == nil {
@@ -64,7 +72,7 @@ func NewServer(opts ServerOpts) *Server {
 		go s.Validator()
 	}
 
-	return s
+	return s, nil
 }
 
 func (s *Server) Start() {
