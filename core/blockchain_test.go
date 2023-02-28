@@ -25,7 +25,7 @@ func (bc *BlockChain) BlockWithHash(t *testing.T, height uint32) (*Block, error)
 
 	txs := NewTransactionWithSig("foo")
 
-	b, err := NewBlock(Header(*h), []Transaction{*txs})
+	b, err := NewBlock(Header(*h), []*Transaction{txs})
 
 	if err != nil {
 		return nil, err

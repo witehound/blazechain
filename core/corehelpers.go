@@ -34,7 +34,7 @@ func RandomBlock(height uint32) (*Block, error) {
 	}
 
 	tx := NewTransactionWithSig("food")
-	b, err := NewBlock(Header(*h), []Transaction{*tx})
+	b, err := NewBlock(Header(*h), []*Transaction{tx})
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +50,7 @@ func GenesisBlock() (*Block, error) {
 		TimeStamp:     time.Now().UnixNano(),
 	}
 
-	b, err := NewBlock(Header(*h), []Transaction{})
+	b, err := NewBlock(Header(*h), []*Transaction{})
 	if err != nil {
 		return nil, err
 	}

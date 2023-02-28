@@ -132,7 +132,9 @@ func (s *Server) CreateNewBlock() error {
 		return err
 	}
 
-	block, err := core.NewBlockFromPrevHeader(currHeader, nil)
+	tsx := s.MemePool.AllTransactions()
+
+	block, err := core.NewBlockFromPrevHeader(currHeader, tsx)
 	if err != nil {
 		return err
 	}
