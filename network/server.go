@@ -50,12 +50,15 @@ func NewServer(opts ServerOpts) *Server {
 		s.ServerOpts.RPCProcessor = s
 	}
 
+	if s.isValidator {
+		go s.Validator()
+	}
+
 	return s
 }
 
 func (s *Server) Start() {
 	s.InitTransports()
-	ticker := time.NewTicker(s.BlockTime)
 
 free:
 	for {
@@ -70,10 +73,7 @@ free:
 			}
 		case <-s.quitCh:
 			break free
-		case <-ticker.C:
-			if s.isValidator {
-				s.CreateNewBlock()
-			}
+
 		}
 	}
 
@@ -152,4 +152,13 @@ func (s *Server) BroadCastTx(tx *core.Transaction) error {
 
 	msg := NewMessage(MessageTypeTx, buf.Bytes())
 	return s.BroadCasting(msg.Bytes())
+}
+
+func (s *Server) Validator() {
+	ticker := time.NewTicker(s.BlockTime)
+	for {
+		<-ticker.C
+		s.CreateNewBlock()
+	}
+
 }
