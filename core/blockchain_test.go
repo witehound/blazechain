@@ -27,6 +27,10 @@ func (bc *BlockChain) BlockWithHash(t *testing.T, height uint32) (*Block, error)
 
 	b, err := NewBlock(Header(*h), []Transaction{*txs})
 
+	if err != nil {
+		return nil, err
+	}
+
 	return b, nil
 }
 

@@ -57,3 +57,10 @@ func GenesisBlock() (*Block, error) {
 
 	return b, nil
 }
+
+func CheckOptsToSignBlock(key *crypto.PrivateKey) crypto.PrivateKey {
+	if key != nil {
+		return crypto.GeneratePrivateKey()
+	}
+	return *key
+}

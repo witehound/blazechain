@@ -51,20 +51,13 @@ func NewServer(opts ServerOpts) (*Server, error) {
 
 	var chain *core.BlockChain
 
-	if opts.PrivateKey != nil {
-		bc, err := core.StartNewBlockChainWithGenesis(*opts.PrivateKey)
-		if err != nil {
-			return nil, err
-		}
-		chain = bc
-	} else {
-		privkey := crypto.GeneratePrivateKey()
-		bc, err := core.StartNewBlockChainWithGenesis(privkey)
-		if err != nil {
-			return nil, err
-		}
-		chain = bc
+	privKey := core.CheckOptsToSignBlock(opts.PrivateKey)
+
+	bc, err := core.StartNewBlockChainWithGenesis(privKey)
+	if err != nil {
+		return nil, err
 	}
+	chain = bc
 
 	s := &Server{
 		ServerOpts:  opts,
@@ -133,6 +126,7 @@ func (s *Server) ProcessTransaction(tx *core.Transaction) error {
 }
 
 func (s *Server) CreateNewBlock() error {
+
 	currHeader, err := s.Chain.BlockHeader(s.Chain.Height())
 	if err != nil {
 		return err
@@ -143,11 +137,18 @@ func (s *Server) CreateNewBlock() error {
 		return err
 	}
 
-	if err := s.Chain.AddBlock(block); err != nil {
+	privKey := core.CheckOptsToSignBlock(s.ServerOpts.PrivateKey)
+
+	if err := block.Sign(privKey); err != nil {
 		return err
 	}
 
-	// s.MemePool.Flush()
+	if err := s.Chain.AddBlock(block); err != nil {
+		logrus.Error(err)
+		return err
+	}
+
+	s.MemePool.Flush()
 
 	return nil
 }
