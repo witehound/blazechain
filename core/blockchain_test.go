@@ -25,7 +25,9 @@ func (bc *BlockChain) BlockWithHash(t *testing.T, height uint32) (*Block, error)
 
 	txs := NewTransactionWithSig("foo")
 
-	return NewBlock(Header(*h), []Transaction{*txs}), nil
+	b, err := NewBlock(Header(*h), []Transaction{*txs})
+
+	return b, nil
 }
 
 func TestBlockChainInit(t *testing.T) {

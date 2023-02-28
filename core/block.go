@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/gob"
 	"fmt"
+	"time"
 
 	"github.com/witehound/blazechain/crypto"
 	"github.com/witehound/blazechain/types"
@@ -42,11 +43,11 @@ func (b *Block) Encode(enc Encoder[*Block]) error {
 	return enc.Encode(b)
 }
 
-func NewBlock(h Header, txs []Transaction) *Block {
+func NewBlock(h Header, txs []Transaction) (*Block, error) {
 	return &Block{
 		Header:       h,
 		Transactions: txs,
-	}
+	}, nil
 }
 
 func (b *Block) AddTransaction(tx *Transaction) {
@@ -115,4 +116,26 @@ func CalculateDataHash(tsx []Transaction) (hash types.Hash, err error) {
 
 	hash = sha256.Sum256(buf.Bytes())
 	return
+}
+
+func NewBlockFromPrevHeader(ph *Header, tsx []Transaction) (*Block, error) {
+	hash, err := CalculateDataHash(tsx)
+	if err != nil {
+		return nil, err
+	}
+	header := &Header{
+		Version:       1,
+		DataHash:      hash,
+		PrevBlockHash: BlockHasher{}.Hash(ph),
+		TimeStamp:     time.Now().UnixNano(),
+		Height:        ph.Height + 1,
+	}
+
+	b, err := NewBlock(*header, tsx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return b, nil
 }

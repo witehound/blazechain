@@ -35,7 +35,8 @@ func (bc *BlockChain) RandomBlockWithSig(t *testing.T, height uint32) (*Block, e
 
 func TestBlock_Signing(t *testing.T) {
 	privkey := crypto.GeneratePrivateKey()
-	b := RandomBlock(0)
+	b, err := RandomBlock(0)
+	assert.Nil(t, err)
 
 	assert.Nil(t, b.Sign(privkey))
 
@@ -44,7 +45,8 @@ func TestBlock_Signing(t *testing.T) {
 
 func TestBlock_Verifying(t *testing.T) {
 	privkey := crypto.GeneratePrivateKey()
-	b := RandomBlock(0)
+	b, err := RandomBlock(0)
+	assert.Nil(t, err)
 
 	dataHash, err := CalculateDataHash(b.Transactions)
 
@@ -55,7 +57,9 @@ func TestBlock_Verifying(t *testing.T) {
 
 	assert.Nil(t, b.Verify())
 
-	v := RandomBlock(1)
+	v, err := RandomBlock(1)
+
+	assert.Nil(t, err)
 
 	assert.NotNil(t, v.Verify())
 

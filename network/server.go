@@ -3,7 +3,6 @@ package network
 import (
 	"bytes"
 
-	"fmt"
 	"os"
 	"time"
 
@@ -134,7 +133,19 @@ func (s *Server) ProcessTransaction(tx *core.Transaction) error {
 }
 
 func (s *Server) CreateNewBlock() error {
-	fmt.Println("creating a new block")
+	currHeader, err := s.Chain.BlockHeader(s.Chain.Height())
+	if err != nil {
+		return err
+	}
+
+	block, err := core.NewBlockFromPrevHeader(currHeader, nil)
+	if err != nil {
+		return err
+	}
+
+	if err := s.Chain.AddBlock(block); err != nil {
+		return err
+	}
 
 	// s.MemePool.Flush()
 

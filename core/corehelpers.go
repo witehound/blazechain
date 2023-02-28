@@ -9,15 +9,10 @@ import (
 
 func StartNewBlockChainWithGenesis(privKey crypto.PrivateKey) (*BlockChain, error) {
 
-	b := RandomBlock(0)
-
-	dataHash, err := CalculateDataHash(b.Transactions)
-
+	b, err := GenesisBlock()
 	if err != nil {
 		return nil, err
 	}
-
-	b.Header.DataHash = dataHash
 
 	b.Sign(privKey)
 
@@ -30,7 +25,7 @@ func StartNewBlockChainWithGenesis(privKey crypto.PrivateKey) (*BlockChain, erro
 	return bc, nil
 }
 
-func RandomBlock(height uint32) *Block {
+func RandomBlock(height uint32) (*Block, error) {
 	h := &Header{
 		Version:       1,
 		PrevBlockHash: types.RandomHash(),
@@ -39,6 +34,26 @@ func RandomBlock(height uint32) *Block {
 	}
 
 	tx := NewTransactionWithSig("food")
+	b, err := NewBlock(Header(*h), []Transaction{*tx})
+	if err != nil {
+		return nil, err
+	}
 
-	return NewBlock(Header(*h), []Transaction{*tx})
+	return b, nil
+}
+
+func GenesisBlock() (*Block, error) {
+	h := &Header{
+		Version:       1,
+		PrevBlockHash: types.RandomHash(),
+		Height:        0,
+		TimeStamp:     time.Now().UnixNano(),
+	}
+
+	b, err := NewBlock(Header(*h), []Transaction{})
+	if err != nil {
+		return nil, err
+	}
+
+	return b, nil
 }
