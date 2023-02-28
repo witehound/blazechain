@@ -3,6 +3,7 @@ package core
 import (
 	"time"
 
+	"github.com/go-kit/log"
 	"github.com/witehound/blazechain/crypto"
 	"github.com/witehound/blazechain/types"
 )
@@ -63,4 +64,32 @@ func CheckOptsToSignBlock(key *crypto.PrivateKey) crypto.PrivateKey {
 		return crypto.GeneratePrivateKey()
 	}
 	return *key
+}
+
+func StartNewBlockChainGenesisLogger(privKey crypto.PrivateKey, logger log.Logger) (*BlockChain, error) {
+
+	b, err := GenesisBlock()
+	if err != nil {
+		return nil, err
+	}
+
+	b.Sign(privKey)
+
+	bc := &BlockChain{
+		Headers: []*Header{},
+		Store:   NewMemoryStote(),
+		Logger:  logger,
+	}
+
+	bc.Validator = NewBlockValidator(bc)
+
+	bc.AddBlockWithoutValidator(b)
+
+	bc.Logger = logger
+
+	if err != nil {
+		return nil, err
+	}
+
+	return bc, nil
 }

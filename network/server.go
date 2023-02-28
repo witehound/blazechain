@@ -53,7 +53,8 @@ func NewServer(opts ServerOpts) (*Server, error) {
 
 	privKey := core.CheckOptsToSignBlock(opts.PrivateKey)
 
-	bc, err := core.StartNewBlockChainWithGenesis(privKey)
+	bc, err := core.StartNewBlockChainGenesisLogger(privKey, opts.Logger)
+
 	if err != nil {
 		return nil, err
 	}
