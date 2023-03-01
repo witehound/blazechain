@@ -200,6 +200,10 @@ func (s *Server) BroadCastTx(tx *core.Transaction) error {
 }
 
 func (s *Server) BroadCastBlock(b *core.Block) error {
+	buf := &bytes.Buffer{}
+	if err := b.Encode(core.NewGobBlockEncoder(buf)); err != nil {
+		return err
+	}
 
 	return nil
 }
