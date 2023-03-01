@@ -51,7 +51,7 @@ func GenesisBlock() (*Block, error) {
 		Version:       1,
 		PrevBlockHash: types.RandomHash(),
 		Height:        0,
-		TimeStamp:     time.Now().UnixNano(),
+		TimeStamp:     0000000,
 	}
 
 	b, err := NewBlock(Header(*h), []*Transaction{})

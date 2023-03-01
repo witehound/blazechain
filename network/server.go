@@ -199,6 +199,11 @@ func (s *Server) BroadCastTx(tx *core.Transaction) error {
 	return s.BroadCasting(msg.Bytes())
 }
 
+func (s *Server) BroadCastBlock(b *core.Block) error {
+
+	return nil
+}
+
 func (s *Server) Validator() {
 	ticker := time.NewTicker(s.BlockTime)
 

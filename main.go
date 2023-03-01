@@ -4,10 +4,12 @@ import (
 	"bytes"
 	"fmt"
 	"log"
+	"time"
 
 	"math/rand"
 	"strconv"
 
+	"github.com/sirupsen/logrus"
 	"github.com/witehound/blazechain/core"
 	"github.com/witehound/blazechain/crypto"
 	"github.com/witehound/blazechain/network"
@@ -23,7 +25,19 @@ func main() {
 	trRemoteA.Connect(trRemoteB)
 	trRemoteB.Connect(trRemoteC)
 
+	trRemoteA.Connect(trLocal)
+
 	MakeRemoteServers([]network.Transport{trRemoteA, trRemoteB, trRemoteC})
+
+	go func() {
+		for {
+			if err := SendTransaction(trRemoteA, trLocal.Addr()); err != nil {
+				logrus.Error(err)
+			}
+			time.Sleep(2 * time.Second)
+		}
+
+	}()
 
 	privKey := crypto.GeneratePrivateKey()
 
