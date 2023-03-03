@@ -223,4 +223,4 @@ func (s *Server) Validator() {
 // integrated deposit in the escrow programme
 // integrated accepet deal in the escrow programme
 // integrated release func in the escrow programme
-
+// abstracting escrow programe
