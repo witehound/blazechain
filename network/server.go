@@ -220,4 +220,5 @@ func (s *Server) Validator() {
 
 }
 
-// integrate deposit in the escrow programme
+// integrated deposit in the escrow programme
+// integrating accepet deal in the escrow programme
