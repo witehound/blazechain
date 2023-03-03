@@ -219,3 +219,5 @@ func (s *Server) Validator() {
 	}
 
 }
+
+// integrate deposit in the escrow programme
