@@ -226,3 +226,4 @@ func (s *Server) Validator() {
 // refactoring escrow programme to smaller moddules
 // done testing all 3 cases and they passed
 // buildding project locally with anchor
+// added anchor to local envirmonet
