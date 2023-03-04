@@ -225,3 +225,4 @@ func (s *Server) Validator() {
 // integrated release func in the escrow programme
 // refactoring escrow programme to smaller moddules
 // done testing all 3 cases and they passed
+// buildding project locally with anchor
