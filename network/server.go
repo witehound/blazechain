@@ -224,3 +224,4 @@ func (s *Server) Validator() {
 // integrated accepet deal in the escrow programme
 // integrated release func in the escrow programme
 // refactoring escrow programme to smaller moddules
+// done testing all 3 cases and they passed
