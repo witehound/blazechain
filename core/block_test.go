@@ -1,6 +1,7 @@
 package core
 
 import (
+	"bytes"
 	"fmt"
 	"testing"
 
@@ -63,4 +64,18 @@ func TestBlock_Verifying(t *testing.T) {
 
 	assert.NotNil(t, v.Verify())
 
+}
+
+func TestBlock_Decode_Encode(t *testing.T) {
+	b, err := RandomBlock(0)
+
+	assert.Nil(t, err)
+
+	buf := &bytes.Buffer{}
+
+	assert.Nil(t, b.Encode(NewGobBlockEncoder(buf)))
+
+	bDecode := new(Block)
+
+	assert.Nil(t, bDecode.Decode(NewGobBlockDecoder(buf)))
 }
