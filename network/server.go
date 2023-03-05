@@ -2,6 +2,7 @@ package network
 
 import (
 	"bytes"
+	"fmt"
 
 	"os"
 	"time"
@@ -100,6 +101,7 @@ free:
 			if err := s.RPCProcessor.ProcessMessage(msg); err != nil {
 				s.Logger.Log("error", err)
 			}
+
 		case <-s.quitCh:
 			break free
 
@@ -125,6 +127,15 @@ func (s *Server) ProcessTransaction(tx *core.Transaction) error {
 
 	s.MemePool.Add(tx)
 
+	logrus.WithFields(logrus.Fields{
+		"msg": "added new tx to memepool",
+	}).Info("addedd new block")
+
+	return nil
+}
+
+func (s *Server) ProcessBlock(b *core.Block) error {
+	fmt.Printf("%v ", b)
 	return nil
 }
 
@@ -152,6 +163,8 @@ func (s *Server) CreateNewBlock() error {
 
 	s.MemePool.ClearPending()
 
+	go s.BroadCastBlock(block)
+
 	return nil
 }
 
@@ -170,6 +183,8 @@ func (s *Server) ProcessMessage(msg *DecodedMsg) error {
 	switch t := msg.Data.(type) {
 	case *core.Transaction:
 		return s.ProcessTransaction(t)
+		// case *core.Block:
+		// 	s.ProcessBlock(t)
 	}
 
 	return nil
@@ -201,7 +216,9 @@ func (s *Server) BroadCastBlock(b *core.Block) error {
 		return err
 	}
 
-	return nil
+	msg := NewMessage(MessageTypeBlock, buf.Bytes())
+
+	return s.BroadCasting(msg.Bytes())
 }
 
 func (s *Server) Validator() {

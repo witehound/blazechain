@@ -34,6 +34,7 @@ func main() {
 			if err := SendTransaction(trRemoteA, trLocal.Addr()); err != nil {
 				logrus.Error(err)
 			}
+
 			time.Sleep(2 * time.Second)
 		}
 
