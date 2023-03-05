@@ -1,75 +1,125 @@
 package network
 
 import (
-	"sort"
+	"sync"
 
 	"github.com/witehound/blazechain/core"
 	"github.com/witehound/blazechain/types"
 )
 
-type TxMapSorter struct {
-	transactions []*core.Transaction
+type TxPool struct {
+	all     *TxSortedMap
+	pending *TxSortedMap
+	// The maxLength of the total pool of transactions.
+	// When the pool is full we will prune the oldest transaction.
+	maxLength int
 }
 
-func NewTxMapSorter(txMap map[types.Hash]*core.Transaction) *TxMapSorter {
-	tsx := make([]*core.Transaction, len(txMap))
-
-	i := 0
-	for _, value := range txMap {
-		tsx[i] = value
-		i++
-	}
-
-	s := &TxMapSorter{transactions: tsx}
-
-	sort.Sort(s)
-
-	return s
-
-}
-
-func (t *TxMapSorter) Len() int {
-	return len(t.transactions)
-}
-
-func (t *TxMapSorter) Swap(i, j int) {
-	t.transactions[i], t.transactions[j] = t.transactions[j], t.transactions[i]
-}
-func (t *TxMapSorter) Less(i, j int) bool {
-	return t.transactions[i].FirstSeen() < t.transactions[j].FirstSeen()
-}
-
-type MemePool struct {
-	Transactions map[types.Hash]*core.Transaction
-}
-
-func NewMemePool() *MemePool {
-	return &MemePool{
-		Transactions: make(map[types.Hash]*core.Transaction),
+func NewMemePool(maxLength int) *TxPool {
+	return &TxPool{
+		all:       NewTxSortedMap(),
+		pending:   NewTxSortedMap(),
+		maxLength: maxLength,
 	}
 }
 
-func (mp *MemePool) Len() int {
-	return len(mp.Transactions)
+func (p *TxPool) Add(tx *core.Transaction) {
+	// prune the oldest transaction that is sitting in the all pool
+	if p.all.Count() == p.maxLength {
+		oldest := p.all.First()
+		p.all.Remove(oldest.Hash(core.TxHasher{}))
+	}
+
+	if !p.all.Contains(tx.Hash(core.TxHasher{})) {
+		p.all.Add(tx)
+		p.pending.Add(tx)
+	}
 }
 
-func (mp *MemePool) Flush() {
-	mp.Transactions = make(map[types.Hash]*core.Transaction)
+func (p *TxPool) Contains(hash types.Hash) bool {
+	return p.all.Contains(hash)
 }
 
-func (mp *MemePool) AddTx(hash types.Hash, tx *core.Transaction) error {
-
-	mp.Transactions[hash] = tx
-	return nil
+// Pending returns a slice of transactions that are in the pending pool
+func (p *TxPool) Pending() []*core.Transaction {
+	return p.pending.txx.Data
 }
 
-func (mp *MemePool) Has(h types.Hash) bool {
-	_, ok := mp.Transactions[h]
+func (p *TxPool) ClearPending() {
+	p.pending.Clear()
+}
+
+func (p *TxPool) PendingCount() int {
+	return p.pending.Count()
+}
+
+type TxSortedMap struct {
+	lock   sync.RWMutex
+	lookup map[types.Hash]*core.Transaction
+	txx    *types.List[*core.Transaction]
+}
+
+func NewTxSortedMap() *TxSortedMap {
+	return &TxSortedMap{
+		lookup: make(map[types.Hash]*core.Transaction),
+		txx:    types.NewList[*core.Transaction](),
+	}
+}
+
+func (t *TxSortedMap) First() *core.Transaction {
+	t.lock.RLock()
+	defer t.lock.RUnlock()
+
+	first := t.txx.Get(0)
+	return t.lookup[first.Hash(core.TxHasher{})]
+}
+
+func (t *TxSortedMap) Get(h types.Hash) *core.Transaction {
+	t.lock.RLock()
+	defer t.lock.RUnlock()
+
+	return t.lookup[h]
+}
+
+func (t *TxSortedMap) Add(tx *core.Transaction) {
+	hash := tx.Hash(core.TxHasher{})
+
+	t.lock.Lock()
+	defer t.lock.Unlock()
+
+	if _, ok := t.lookup[hash]; !ok {
+		t.lookup[hash] = tx
+		t.txx.Insert(tx)
+	}
+}
+
+func (t *TxSortedMap) Remove(h types.Hash) {
+	t.lock.Lock()
+	defer t.lock.Unlock()
+
+	t.txx.Remove(t.lookup[h])
+	delete(t.lookup, h)
+}
+
+func (t *TxSortedMap) Count() int {
+	t.lock.RLock()
+	defer t.lock.RUnlock()
+
+	return len(t.lookup)
+}
+
+func (t *TxSortedMap) Contains(h types.Hash) bool {
+	t.lock.RLock()
+	defer t.lock.RUnlock()
+
+	_, ok := t.lookup[h]
 	return ok
 }
 
-func (mp *MemePool) AllTransactions() []*core.Transaction {
-	s := NewTxMapSorter(mp.Transactions)
+func (t *TxSortedMap) Clear() {
+	t.lock.Lock()
+	defer t.lock.Unlock()
 
-	return s.transactions
+	t.lookup = make(map[types.Hash]*core.Transaction)
+	t.txx.Clear()
 }

@@ -2,6 +2,8 @@ package core
 
 import (
 	"bytes"
+	"math/rand"
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -44,7 +46,7 @@ func TestVerifyTx(t *testing.T) {
 func TestTxEncodeDecode(t *testing.T) {
 	privkey := crypto.GeneratePrivateKey()
 
-	tx := NewTransactionWithSig("foo")
+	tx := NewTransactionWithSig(strconv.Itoa(rand.Intn(1000000000)))
 	buf := &bytes.Buffer{}
 	assert.Nil(t, tx.SignTx(privkey))
 

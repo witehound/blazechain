@@ -30,7 +30,7 @@ type Server struct {
 	isValidator bool
 	rpcCh       chan RPC
 	quitCh      chan struct{}
-	MemePool    *MemePool
+	MemePool    *TxPool
 	Chain       *core.BlockChain
 }
 
@@ -71,7 +71,7 @@ func NewServer(opts ServerOpts) (*Server, error) {
 		rpcCh:       make(chan RPC),
 		isValidator: opts.PrivateKey != nil,
 		quitCh:      make(chan struct{}, 1),
-		MemePool:    NewMemePool(),
+		MemePool:    NewMemePool(1),
 		Chain:       chain,
 	}
 
@@ -112,7 +112,7 @@ free:
 func (s *Server) ProcessTransaction(tx *core.Transaction) error {
 	hash := tx.Hash(core.TxHasher{})
 
-	if s.MemePool.Has(hash) {
+	if s.MemePool.Contains(hash) {
 
 		return nil
 	}
@@ -121,15 +121,11 @@ func (s *Server) ProcessTransaction(tx *core.Transaction) error {
 		return err
 	}
 
-	tx.SetFirstSeen(time.Now().UnixNano())
-
-	s.Logger.Log("msg", "adding new tx  to memepool",
-		"hash", hash,
-		"memepool length", s.MemePool.Len())
-
 	go s.BroadCastTx(tx)
 
-	return s.MemePool.AddTx(hash, tx)
+	s.MemePool.Add(tx)
+
+	return nil
 }
 
 func (s *Server) CreateNewBlock() error {
@@ -139,7 +135,7 @@ func (s *Server) CreateNewBlock() error {
 		return err
 	}
 
-	tsx := s.MemePool.AllTransactions()
+	tsx := s.MemePool.Pending()
 
 	block, err := core.NewBlockFromPrevHeader(currHeader, tsx)
 	if err != nil {
@@ -154,7 +150,7 @@ func (s *Server) CreateNewBlock() error {
 		return err
 	}
 
-	s.MemePool.Flush()
+	s.MemePool.ClearPending()
 
 	return nil
 }
@@ -219,4 +215,3 @@ func (s *Server) Validator() {
 	}
 
 }
-
