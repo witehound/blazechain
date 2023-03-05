@@ -2,7 +2,6 @@ package network
 
 import (
 	"bytes"
-	"fmt"
 
 	"os"
 	"time"
@@ -127,15 +126,17 @@ func (s *Server) ProcessTransaction(tx *core.Transaction) error {
 
 	s.MemePool.Add(tx)
 
-	logrus.WithFields(logrus.Fields{
-		"msg": "added new tx to memepool",
-	}).Info("addedd new block")
+	// logrus.WithFields(logrus.Fields{}).Info("added new tx to memepool")
 
 	return nil
 }
 
 func (s *Server) ProcessBlock(b *core.Block) error {
-	fmt.Printf("%v ", b)
+	if err := s.Chain.AddBlock(b); err != nil {
+		return err
+	}
+
+	go s.BroadCastBlock(b)
 	return nil
 }
 
@@ -183,8 +184,8 @@ func (s *Server) ProcessMessage(msg *DecodedMsg) error {
 	switch t := msg.Data.(type) {
 	case *core.Transaction:
 		return s.ProcessTransaction(t)
-		// case *core.Block:
-		// 	s.ProcessBlock(t)
+	case *core.Block:
+		s.ProcessBlock(t)
 	}
 
 	return nil

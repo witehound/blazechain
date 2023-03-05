@@ -5,7 +5,6 @@ import (
 	"sync"
 
 	"github.com/go-kit/log"
-	"github.com/sirupsen/logrus"
 )
 
 type BlockChain struct {
@@ -16,10 +15,11 @@ type BlockChain struct {
 	Logger    log.Logger
 }
 
-func NewBlockChain(genesis *Block) (*BlockChain, error) {
+func NewBlockChain(l log.Logger, genesis *Block) (*BlockChain, error) {
 	bc := &BlockChain{
 		Headers: []*Header{},
 		Store:   NewMemoryStote(),
+		Logger:  l,
 	}
 
 	bc.Validator = NewBlockValidator(bc)
@@ -63,10 +63,12 @@ func (bc *BlockChain) AddBlockWithoutValidator(b *Block) error {
 	bc.Headers = append(bc.Headers, &b.Header)
 	bc.Lock.RUnlock()
 
-	logrus.WithFields(logrus.Fields{
-		"height": b.Header.Height,
-		"hash":   BlockHasher{}.Hash(&b.Header),
-	}).Info("addedd new block")
+	// bc.Logger.Log(
+	// 	"msg", "new block",
+	// 	"hash", b.Hash(BlockHasher{}),
+	// 	"height", b.Header.Height,
+	// 	"transactions", len(b.Transactions),
+	// )
 
 	return bc.Store.Put(b)
 

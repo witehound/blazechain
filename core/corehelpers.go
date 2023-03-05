@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/go-kit/log"
@@ -9,7 +8,7 @@ import (
 	"github.com/witehound/blazechain/types"
 )
 
-func StartNewBlockChainWithGenesis(privKey crypto.PrivateKey) (*BlockChain, error) {
+func StartNewBlockChainWithGenesis(l log.Logger, privKey crypto.PrivateKey) (*BlockChain, error) {
 
 	b, err := GenesisBlock()
 	if err != nil {
@@ -18,9 +17,7 @@ func StartNewBlockChainWithGenesis(privKey crypto.PrivateKey) (*BlockChain, erro
 
 	b.Sign(privKey)
 
-	fmt.Println(b)
-
-	bc, err := NewBlockChain(b)
+	bc, err := NewBlockChain(l, b)
 
 	if err != nil {
 		return nil, err
