@@ -78,4 +78,6 @@ func TestBlock_Decode_Encode(t *testing.T) {
 	bDecode := new(Block)
 
 	assert.Nil(t, bDecode.Decode(NewGobBlockDecoder(buf)))
+
+	assert.Equal(t, b, bDecode)
 }
