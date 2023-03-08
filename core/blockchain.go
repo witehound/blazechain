@@ -15,11 +15,10 @@ type BlockChain struct {
 	Logger    log.Logger
 }
 
-func NewBlockChain(l log.Logger, genesis *Block) (*BlockChain, error) {
+func NewBlockChain(genesis *Block) (*BlockChain, error) {
 	bc := &BlockChain{
 		Headers: []*Header{},
 		Store:   NewMemoryStote(),
-		Logger:  l,
 	}
 
 	bc.Validator = NewBlockValidator(bc)
@@ -63,12 +62,7 @@ func (bc *BlockChain) AddBlockWithoutValidator(b *Block) error {
 	bc.Headers = append(bc.Headers, &b.Header)
 	bc.Lock.RUnlock()
 
-	// bc.Logger.Log(
-	// 	"msg", "new block",
-	// 	"hash", b.Hash(BlockHasher{}),
-	// 	"height", b.Header.Height,
-	// 	"transactions", len(b.Transactions),
-	// )
+	bc.Logger.Log("msg", "adding block", "height", b.Header.Height)
 
 	return bc.Store.Put(b)
 

@@ -1,11 +1,9 @@
 package core
 
 import (
-	"os"
 	"testing"
 	"time"
 
-	"github.com/go-kit/log"
 	"github.com/stretchr/testify/assert"
 	"github.com/witehound/blazechain/crypto"
 )
@@ -51,26 +49,23 @@ func TestBlockChainInit(t *testing.T) {
 }
 
 func TestAddBlock(t *testing.T) {
-	// := crypto.GeneratePrivateKey()
-	var l log.Logger = log.NewLogfmtLogger(os.Stderr)
+	privkey := crypto.GeneratePrivateKey()
 
-	l = log.With(l, "ID", "TEST")
+	bc, err := StartNewBlockChainWithGenesis(privkey)
 
-	// bc, err := StartNewBlockChainWithGenesis(l, privkey)
+	assert.Nil(t, err)
 
-	// assert.Nil(t, err)
+	assert.NotNil(t, bc.Validator)
+	var ct uint32 = 0
 
-	// assert.NotNil(t, bc.Validator)
-	// var ct uint32 = 0
+	for i := 0; i < 1000; i++ {
+		ct++
+		tb, err := bc.RandomBlockWithSig(t, uint32(i+1))
+		assert.Nil(t, err)
+		bc.AddBlock(tb)
+	}
 
-	// for i := 0; i < 1000; i++ {
-	// 	ct++
-	// 	tb, err := bc.RandomBlockWithSig(t, uint32(i+1))
-	// 	assert.Nil(t, err)
-	// 	bc.AddBlock(tb)
-	// }
-
-	// assert.Equal(t, bc.Height(), ct)
+	assert.Equal(t, bc.Height(), ct)
 }
 
 func TestValidator(t *testing.T) {
@@ -127,5 +122,4 @@ func TestBlockHeeder(t *testing.T) {
 	}
 }
 
-//better understanding of integration
-//completed last solana escrow contract build
+//

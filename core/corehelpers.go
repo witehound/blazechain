@@ -8,7 +8,7 @@ import (
 	"github.com/witehound/blazechain/types"
 )
 
-func StartNewBlockChainWithGenesis(l log.Logger, privKey crypto.PrivateKey) (*BlockChain, error) {
+func StartNewBlockChainWithGenesis(privKey crypto.PrivateKey) (*BlockChain, error) {
 
 	b, err := GenesisBlock()
 	if err != nil {
@@ -17,7 +17,7 @@ func StartNewBlockChainWithGenesis(l log.Logger, privKey crypto.PrivateKey) (*Bl
 
 	b.Sign(privKey)
 
-	bc, err := NewBlockChain(l, b)
+	bc, err := NewBlockChain(b)
 
 	if err != nil {
 		return nil, err
