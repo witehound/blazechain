@@ -87,4 +87,4 @@ func MakeRemoteServers(trs []network.Transport) *network.Server {
 	return nil
 }
 
-// more learning for solana integration
+// migrating solana functionality to new front end
