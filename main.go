@@ -87,6 +87,4 @@ func MakeRemoteServers(trs []network.Transport) *network.Server {
 	return nil
 }
 
-// migrating solana functionality to new front end
-// done with integrating solana provider
-// better at solana web 3 interractions
+// completed the deposit action on the web3 integration
