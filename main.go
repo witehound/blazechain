@@ -88,3 +88,4 @@ func MakeRemoteServers(trs []network.Transport) *network.Server {
 }
 
 // completed the deposit action on the web3 integration
+// completed the release fund on the web3 integration
