@@ -41,9 +41,11 @@ func main() {
 	}()
 
 	go func() {
+		time.Sleep(7 * time.Second)
 		trlate := network.NewLocalTransport("lATE_REMOTE")
+		trRemoteC.Connect(trlate)
 		lateServer := MakeServer(string(trlate.Addr()), trlate, nil)
-		time.Sleep(5 * time.Second)
+
 		go lateServer.Start()
 	}()
 

@@ -71,7 +71,8 @@ func (bc *BlockChain) AddBlockWithoutValidator(b *Block) error {
 
 func (bc *BlockChain) BlockHeader(h uint32) (*Header, error) {
 	if !bc.HasBlock(h) {
-		return nil, fmt.Errorf("block to high : %d", h)
+
+		return nil, fmt.Errorf("given height (%d) too high", h)
 	}
 
 	bc.Lock.RLock()

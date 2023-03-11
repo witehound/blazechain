@@ -128,7 +128,7 @@ func (s *Server) ProcessTransaction(tx *core.Transaction) error {
 
 	s.MemePool.Add(tx)
 
-	s.Logger.Log("added new tx to memepool", hash)
+	// s.Logger.Log(" memepool", hash)
 
 	return nil
 }
