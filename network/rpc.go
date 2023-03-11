@@ -40,22 +40,15 @@ type RPCProcessor interface {
 func DefaultRPCDecodeFunc(rpc RPC) (*DecodedMsg, error) {
 
 	msg := Message{}
+
 	if err := gob.NewDecoder(rpc.Payload).Decode(&msg); err != nil {
 		return nil, fmt.Errorf("failed to decode message from this pair %s : %s", rpc.Payload, err)
 	}
 
 	switch msg.Header {
-	case MessageTypeTx:
-		tx := new(core.Transaction)
-		if err := tx.Decode(core.NewGobTxDecoder(bytes.NewReader(msg.Data))); err != nil {
-			return nil, err
-		}
 
-		return &DecodedMsg{
-			from: rpc.From,
-			Data: tx,
-		}, nil
 	case MessageTypeBlock:
+
 		b := new(core.Block)
 
 		if err := b.Decode(core.NewGobBlockDecoder(bytes.NewReader(msg.Data))); err != nil {
@@ -65,6 +58,17 @@ func DefaultRPCDecodeFunc(rpc RPC) (*DecodedMsg, error) {
 		return &DecodedMsg{
 			from: rpc.From,
 			Data: b,
+		}, nil
+
+	case MessageTypeTx:
+		tx := new(core.Transaction)
+		if err := tx.Decode(core.NewGobTxDecoder(bytes.NewReader(msg.Data))); err != nil {
+			return nil, err
+		}
+
+		return &DecodedMsg{
+			from: rpc.From,
+			Data: tx,
 		}, nil
 
 	default:

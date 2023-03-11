@@ -93,10 +93,12 @@ free:
 	for {
 		select {
 		case rpc := <-s.rpcCh:
+
 			msg, err := s.RPCDecodeFunc(rpc)
 			if err != nil {
 				s.Logger.Log("error", err)
 			}
+
 			if err := s.RPCProcessor.ProcessMessage(msg); err != nil {
 				s.Logger.Log("error", err)
 			}
@@ -126,17 +128,19 @@ func (s *Server) ProcessTransaction(tx *core.Transaction) error {
 
 	s.MemePool.Add(tx)
 
-	// logrus.WithFields(logrus.Fields{}).Info("added new tx to memepool")
+	s.Logger.Log("added new tx to memepool", hash)
 
 	return nil
 }
 
 func (s *Server) ProcessBlock(b *core.Block) error {
+
 	if err := s.Chain.AddBlock(b); err != nil {
 		return err
 	}
 
 	go s.BroadCastBlock(b)
+
 	return nil
 }
 
@@ -185,6 +189,7 @@ func (s *Server) ProcessMessage(msg *DecodedMsg) error {
 	case *core.Transaction:
 		return s.ProcessTransaction(t)
 	case *core.Block:
+
 		s.ProcessBlock(t)
 	}
 
@@ -212,6 +217,7 @@ func (s *Server) BroadCastTx(tx *core.Transaction) error {
 }
 
 func (s *Server) BroadCastBlock(b *core.Block) error {
+
 	buf := &bytes.Buffer{}
 	if err := b.Encode(core.NewGobBlockEncoder(buf)); err != nil {
 		return err

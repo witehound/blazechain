@@ -46,7 +46,7 @@ func RandomBlock(height uint32) (*Block, error) {
 func GenesisBlock() (*Block, error) {
 	h := &Header{
 		Version:       1,
-		PrevBlockHash: types.RandomHash(),
+		PrevBlockHash: types.Hash{},
 		Height:        0,
 		TimeStamp:     0000000,
 	}
