@@ -58,6 +58,7 @@ func (bc *BlockChain) HasBlock(height uint32) bool {
 }
 
 func (bc *BlockChain) AddBlockWithoutValidator(b *Block) error {
+
 	bc.Lock.RLock()
 	bc.Headers = append(bc.Headers, &b.Header)
 	bc.Lock.RUnlock()

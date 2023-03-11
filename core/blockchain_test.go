@@ -1,9 +1,11 @@
 package core
 
 import (
+	"os"
 	"testing"
 	"time"
 
+	"github.com/go-kit/log"
 	"github.com/stretchr/testify/assert"
 	"github.com/witehound/blazechain/crypto"
 )
@@ -51,7 +53,10 @@ func TestBlockChainInit(t *testing.T) {
 func TestAddBlock(t *testing.T) {
 	privkey := crypto.GeneratePrivateKey()
 
-	bc, err := StartNewBlockChainWithGenesis(privkey)
+	var Logger log.Logger = log.NewLogfmtLogger(os.Stderr)
+	Logger = log.With(Logger, "ID", "TestAddBlock")
+
+	bc, err := StartNewBlockChainGenesisLogger(privkey, Logger)
 
 	assert.Nil(t, err)
 

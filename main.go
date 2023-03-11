@@ -87,6 +87,4 @@ func MakeRemoteServers(trs []network.Transport) *network.Server {
 	return nil
 }
 
-// completed the deposit action on the web3 integration
-// completed the release fund on the web3 integration
-// completed and debugged all solana escrow functions
+
