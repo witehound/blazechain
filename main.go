@@ -40,6 +40,13 @@ func main() {
 
 	}()
 
+	go func() {
+		trlate := network.NewLocalTransport("lATE_REMOTE")
+		lateServer := MakeServer(string(trlate.Addr()), trlate, nil)
+		time.Sleep(5 * time.Second)
+		go lateServer.Start()
+	}()
+
 	privKey := crypto.GeneratePrivateKey()
 
 	loacalServer := MakeServer("LOCAL", trLocal, &privKey)
@@ -86,5 +93,3 @@ func MakeRemoteServers(trs []network.Transport) *network.Server {
 	}
 	return nil
 }
-
-
