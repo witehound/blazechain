@@ -189,8 +189,7 @@ func (s *Server) ProcessMessage(msg *DecodedMsg) error {
 	case *core.Transaction:
 		return s.ProcessTransaction(t)
 	case *core.Block:
-
-		s.ProcessBlock(t)
+		return s.ProcessBlock(t)
 	}
 
 	return nil
