@@ -41,7 +41,10 @@ func TestBlockChainInit(t *testing.T) {
 
 	assert.NotNil(t, privkey)
 
-	bc, err := StartNewBlockChainWithGenesis(privkey)
+	var Logger log.Logger = log.NewLogfmtLogger(os.Stderr)
+	Logger = log.With(Logger, "ID", "TestAddBlock")
+
+	bc, err := StartNewBlockChainGenesisLogger(privkey, Logger)
 
 	assert.Nil(t, err)
 
@@ -76,7 +79,10 @@ func TestAddBlock(t *testing.T) {
 func TestValidator(t *testing.T) {
 	privkey := crypto.GeneratePrivateKey()
 
-	bc, err := StartNewBlockChainWithGenesis(privkey)
+	var Logger log.Logger = log.NewLogfmtLogger(os.Stderr)
+	Logger = log.With(Logger, "ID", "TestAddBlock")
+
+	bc, err := StartNewBlockChainGenesisLogger(privkey, Logger)
 
 	assert.Nil(t, err)
 
@@ -109,7 +115,10 @@ func TestValidator(t *testing.T) {
 func TestBlockHeeder(t *testing.T) {
 	privkey := crypto.GeneratePrivateKey()
 
-	bc, err := StartNewBlockChainWithGenesis(privkey)
+	var Logger log.Logger = log.NewLogfmtLogger(os.Stderr)
+	Logger = log.With(Logger, "ID", "TestAddBlock")
+
+	bc, err := StartNewBlockChainGenesisLogger(privkey, Logger)
 
 	assert.Nil(t, err)
 
