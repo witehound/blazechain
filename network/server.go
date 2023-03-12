@@ -2,6 +2,7 @@ package network
 
 import (
 	"bytes"
+	"fmt"
 
 	"os"
 	"time"
@@ -237,4 +238,15 @@ func (s *Server) Validator() {
 		s.CreateNewBlock()
 	}
 
+}
+
+func (s *Server) AddNewServer(opts *ServerOpts) (*Server, error) {
+	if !s.isValidator {
+		return nil, fmt.Errorf("server is not a validator")
+	}
+	var ns *Server = s
+	ns.isValidator = false
+	ns.ServerOpts = *opts
+
+	return ns, nil
 }
